@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_9" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="OnboardingViewController" customModule="Photo_Recovery" customModuleProvider="target">
+            <connections>
+                <outlet property="collectionView" destination="p6m-qV-yGr" id="ZQ6-QJ-SRp"/>
+                <outlet property="nextButton" destination="mfm-kO-n4e" id="cps-Tf-lES"/>
+                <outlet property="skipButton" destination="vmn-8E-6QC" id="e5A-AC-Uwz"/>
+                <outlet property="stackViewBottomConstraint" destination="hJD-1h-05G" id="pn0-yL-IXB"/>
+                <outlet property="stackViewTopConstraint" destination="YWx-Y1-EE3" id="pmW-Hn-qhQ"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="440" height="956"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Ya-2N-blO">
+                    <rect key="frame" x="0.0" y="0.0" width="440" height="956"/>
+                    <subviews>
+                        <collectionView clipsSubviews="YES" contentMode="scaleToFill" pagingEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="p6m-qV-yGr">
+                            <rect key="frame" x="0.0" y="0.0" width="440" height="830"/>
+                            <color key="backgroundColor" name="appPrimaryBackground"/>
+                            <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="pin-ab-01X">
+                                <size key="itemSize" width="50" height="50"/>
+                                <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            </collectionViewFlowLayout>
+                            <cells/>
+                        </collectionView>
+                        <stackView opaque="NO" contentMode="scaleToFill" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="tL7-SL-7TQ">
+                            <rect key="frame" x="30" y="850" width="380" height="52"/>
+                            <subviews>
+                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vmn-8E-6QC">
+                                    <rect key="frame" x="0.0" y="0.0" width="95" height="52"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                    <color key="tintColor" name="app-primary-blue"/>
+                                    <state key="normal" title="Skip">
+                                        <color key="titleColor" name="appSecondaryBackground"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="didTapSkipButton:" destination="-1" eventType="touchUpInside" id="qzf-G8-xh3"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mfm-kO-n4e" userLabel="Next">
+                                    <rect key="frame" x="0.0" y="0.0" width="380" height="52"/>
+                                    <color key="backgroundColor" name="app-green-medium"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="52" id="42X-E4-JVo"/>
+                                    </constraints>
+                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                                    <state key="normal" title="Continue">
+                                        <color key="titleColor" name="appSecondaryBackground"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="didTapNextButton:" destination="-1" eventType="touchUpInside" id="mvh-is-Aaj"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="vmn-8E-6QC" firstAttribute="width" secondItem="mfm-kO-n4e" secondAttribute="width" multiplier="0.25" id="6w6-8S-uII"/>
+                                <constraint firstItem="vmn-8E-6QC" firstAttribute="height" secondItem="mfm-kO-n4e" secondAttribute="height" id="aWZ-DE-QAe"/>
+                            </constraints>
+                        </stackView>
+                    </subviews>
+                    <viewLayoutGuide key="safeArea" id="xBe-uY-Wxf"/>
+                    <color key="backgroundColor" name="appPrimaryBackground"/>
+                    <constraints>
+                        <constraint firstItem="xBe-uY-Wxf" firstAttribute="trailing" secondItem="tL7-SL-7TQ" secondAttribute="trailing" constant="30" id="F32-tF-svq"/>
+                        <constraint firstAttribute="trailing" secondItem="p6m-qV-yGr" secondAttribute="trailing" id="Ws5-ji-8mz"/>
+                        <constraint firstItem="tL7-SL-7TQ" firstAttribute="top" secondItem="p6m-qV-yGr" secondAttribute="bottom" constant="20" id="YWx-Y1-EE3"/>
+                        <constraint firstItem="p6m-qV-yGr" firstAttribute="top" secondItem="8Ya-2N-blO" secondAttribute="top" id="b0j-Z5-zeB"/>
+                        <constraint firstItem="xBe-uY-Wxf" firstAttribute="bottom" secondItem="tL7-SL-7TQ" secondAttribute="bottom" constant="20" id="hJD-1h-05G"/>
+                        <constraint firstItem="p6m-qV-yGr" firstAttribute="leading" secondItem="8Ya-2N-blO" secondAttribute="leading" id="oZa-RY-Cs3"/>
+                        <constraint firstItem="tL7-SL-7TQ" firstAttribute="leading" secondItem="xBe-uY-Wxf" secondAttribute="leading" constant="30" id="rcY-mI-JOt"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
+            <color key="backgroundColor" name="appPrimaryBackground"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="8Ya-2N-blO" secondAttribute="bottom" id="7sl-Rs-CDq"/>
+                <constraint firstItem="8Ya-2N-blO" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" constant="-62" id="adk-S8-wdL"/>
+                <constraint firstItem="8Ya-2N-blO" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="yxC-QN-r7z"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="8Ya-2N-blO" secondAttribute="trailing" id="zsC-vj-mTk"/>
+            </constraints>
+            <point key="canvasLocation" x="137.72727272727275" y="19.456066945606697"/>
+        </view>
+    </objects>
+    <resources>
+        <namedColor name="app-green-medium">
+            <color red="0.23921568627450981" green="0.83529411764705885" blue="0.59607843137254901" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="app-primary-blue">
+            <color red="0.0" green="0.29019607843137257" blue="0.67843137254901964" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="appPrimaryBackground">
+            <color red="0.13333333333333333" green="0.20392156862745098" blue="0.23529411764705882" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="appSecondaryBackground">
+            <color red="0.18823529411764706" green="0.26666666666666666" blue="0.30588235294117649" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>
