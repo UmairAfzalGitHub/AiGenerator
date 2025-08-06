@@ -47,7 +47,7 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     }
     
     func checkOnboardingStatus() {
-        UIApplication.shared.updateRootViewController(to: HomeViewContoller())
+        UIApplication.shared.updateRootViewController(to: OnboardingBabyViewController())
         return  // remove this and above line in actual app
         
         // Uncomment this in actual app

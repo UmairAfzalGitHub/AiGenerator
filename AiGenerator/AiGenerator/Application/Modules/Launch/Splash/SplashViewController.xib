@@ -10,7 +10,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SplashViewController" customModule="PhotoSuite_Pro" customModuleProvider="target">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SplashViewController" customModule="AiGenerator" customModuleProvider="target">
             <connections>
                 <outlet property="actionButton" destination="Oo9-MI-obY" id="PX4-3v-eHT"/>
                 <outlet property="bottomStackView" destination="VTu-m9-6jJ" id="TRw-FZ-APO"/>
@@ -53,7 +53,7 @@
                             <color key="textColor" name="text-secondary"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oo9-MI-obY" customClass="AppButton" customModule="PhotoSuite_Pro" customModuleProvider="target">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oo9-MI-obY" customClass="AppButton" customModule="AiGenerator" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="65" width="400" height="52"/>
                             <color key="backgroundColor" name="app-green-medium"/>
                             <constraints>
@@ -81,7 +81,7 @@
                         </textView>
                     </subviews>
                 </stackView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Photo Recovery: RecoverX" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q0O-Dv-2ab">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AI Generator" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Q0O-Dv-2ab">
                     <rect key="frame" x="16" y="476.33333333333331" width="408" height="31.333333333333314"/>
                     <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="26"/>
                     <color key="textColor" name="text-primary"/>
