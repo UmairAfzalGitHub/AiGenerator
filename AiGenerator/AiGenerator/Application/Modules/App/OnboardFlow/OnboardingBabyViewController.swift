@@ -39,6 +39,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         if currentStep == .second {
             parentLabel?.text = "Parent 2"
         }
+
         // Title Label
         let titleLabel = UILabel()
         titleLabel.text = "Meet Your Future Baby"
@@ -99,7 +100,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
 
         // Parent 1 Label
         parentLabel = UILabel()
-        parentLabel.text = "Parent 1"
+        parentLabel.text = (currentStep == .second) ? "Parent 2" : "Parent 1"
         parentLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
         parentLabel.textColor = .white
         parentLabel.textAlignment = .center
