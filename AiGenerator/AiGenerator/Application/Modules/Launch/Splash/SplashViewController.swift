@@ -47,7 +47,11 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     }
     
     func checkOnboardingStatus() {
-        UIApplication.shared.updateRootViewController(to: OnboardingBabyViewController())
+        let homeVC = OnboardingBabyViewController()
+
+        let navController = UINavigationController(rootViewController: homeVC)
+        navController.navigationBar.isHidden = true
+        UIApplication.shared.updateRootViewController(to: navController)
         return  // remove this and above line in actual app
         
         // Uncomment this in actual app

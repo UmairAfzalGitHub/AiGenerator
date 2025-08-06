@@ -8,6 +8,16 @@
 import UIKit
 
 class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerDelegate & UINavigationControllerDelegate {
+    enum ProgressStep {
+        case first
+        case second
+    }
+    private var currentStep: ProgressStep = .first
+    
+    convenience init(step: ProgressStep = .first) {
+        self.init()
+        self.currentStep = step
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,11 +29,16 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
     private var uploadArea: UIView!
     private var uploadIcon: UIImageView!
     private var plusButton: UIButton!
-    private var uploadedImageView: UIImageView?
+    private var parentImageView: UIImageView!
     private var progressDot1: UIView!
     private var progressDot2: UIView!
+    private var parentLabel: UILabel!
 
     private func setupUI() {
+        // Update label for step
+        if currentStep == .second {
+            parentLabel?.text = "Parent 2"
+        }
         // Title Label
         let titleLabel = UILabel()
         titleLabel.text = "Meet Your Future Baby"
@@ -53,7 +68,6 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         view.addSubview(progressStack)
 
         progressDot1 = UIView()
-        progressDot1.backgroundColor = .white
         progressDot1.layer.cornerRadius = 3
         progressDot1.translatesAutoresizingMaskIntoConstraints = false
         progressStack.addArrangedSubview(progressDot1)
@@ -61,12 +75,13 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         progressDot1.heightAnchor.constraint(equalToConstant: 6).isActive = true
 
         progressDot2 = UIView()
-        progressDot2.backgroundColor = UIColor(white: 0.2, alpha: 1)
         progressDot2.layer.cornerRadius = 3
         progressDot2.translatesAutoresizingMaskIntoConstraints = false
         progressStack.addArrangedSubview(progressDot2)
         progressDot2.widthAnchor.constraint(equalToConstant: 54).isActive = true
         progressDot2.heightAnchor.constraint(equalToConstant: 6).isActive = true
+
+        updateProgressDots(for: currentStep)
 
         // Parent Photo Upload Area
         uploadArea = UIView()
@@ -83,13 +98,13 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         uploadArea.addSubview(uploadIcon)
 
         // Parent 1 Label
-        let parent1Label = UILabel()
-        parent1Label.text = "Parent 1"
-        parent1Label.font = UIFont.systemFont(ofSize: 18, weight: .medium)
-        parent1Label.textColor = .white
-        parent1Label.textAlignment = .center
-        parent1Label.translatesAutoresizingMaskIntoConstraints = false
-        uploadArea.addSubview(parent1Label)
+        parentLabel = UILabel()
+        parentLabel.text = "Parent 1"
+        parentLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        parentLabel.textColor = .white
+        parentLabel.textAlignment = .center
+        parentLabel.translatesAutoresizingMaskIntoConstraints = false
+        uploadArea.addSubview(parentLabel)
 
         // Plus Button
         plusButton = UIButton(type: .system)
@@ -99,6 +114,13 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         uploadArea.addSubview(plusButton)
 
+        parentImageView = UIImageView()
+        parentImageView?.contentMode = .scaleAspectFill
+        parentImageView?.clipsToBounds = true
+        parentImageView?.layer.cornerRadius = 16
+        parentImageView?.translatesAutoresizingMaskIntoConstraints = false
+        uploadArea.addSubview(parentImageView)
+        
         // "or" Label
         let orLabel = UILabel()
         orLabel.text = "or"
@@ -150,6 +172,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         continueButton.backgroundColor = UIColor(white: 0.9, alpha: 1)
         continueButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         continueButton.layer.cornerRadius = 24
+        continueButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         continueButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(continueButton)
 
@@ -176,14 +199,18 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
             uploadIcon.widthAnchor.constraint(equalToConstant: 44),
             uploadIcon.heightAnchor.constraint(equalToConstant: 44),
 
-            parent1Label.topAnchor.constraint(equalTo: uploadIcon.bottomAnchor, constant: 12),
-            parent1Label.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
+            parentLabel.topAnchor.constraint(equalTo: uploadIcon.bottomAnchor, constant: 12),
+            parentLabel.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
 
-            plusButton.topAnchor.constraint(equalTo: parent1Label.bottomAnchor, constant: 16),
+            plusButton.topAnchor.constraint(equalTo: parentLabel.bottomAnchor, constant: 16),
             plusButton.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
             plusButton.widthAnchor.constraint(equalToConstant: 36),
             plusButton.heightAnchor.constraint(equalToConstant: 36),
 
+            parentImageView.widthAnchor.constraint(equalTo: uploadArea.widthAnchor),
+            parentImageView.heightAnchor.constraint(equalTo: uploadArea.heightAnchor),
+            parentImageView.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
+            
             orLabel.topAnchor.constraint(equalTo: uploadArea.bottomAnchor, constant: 32),
             orLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
@@ -204,12 +231,46 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         ])
     }
 
-    // MARK: - Image Picker
+    // MARK: - IBActions
     @objc private func plusButtonTapped() {
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.sourceType = .photoLibrary
         present(picker, animated: true)
     }
-
+    
+    @objc private func continueButtonTapped() {
+        // Push a new instance with .second step
+        let nextVC = OnboardingBabyViewController(step: .second)
+        navigationController?.pushViewController(nextVC, animated: true)
+    }
+    
+    private func updateProgressDots(for step: ProgressStep) {
+        switch step {
+        case .first:
+            progressDot1.backgroundColor = .white
+            progressDot2.backgroundColor = UIColor(white: 0.2, alpha: 1)
+        case .second:
+            progressDot1.backgroundColor = UIColor(white: 0.2, alpha: 1)
+            progressDot2.backgroundColor = .white
+        }
+    }
+    
+    // MARK: - UIImagePickerControllerDelegate
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        if let image = info[.originalImage] as? UIImage {
+            showUploadedImage(image)
+        }
+    }
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+    
+    private func showUploadedImage(_ image: UIImage) {
+        uploadIcon.isHidden = true
+        plusButton.isHidden = true
+        parentLabel.isHidden = true
+        parentImageView.image = image
+    }
 }
