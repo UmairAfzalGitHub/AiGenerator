@@ -29,10 +29,13 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
     private var uploadArea: UIView!
     private var uploadIcon: UIImageView!
     private var plusButton: UIButton!
+    private var resetParentImageButton: UIButton!
     private var parentImageView: UIImageView!
     private var progressDot1: UIView!
     private var progressDot2: UIView!
     private var parentLabel: UILabel!
+    private var exampleImage1: UIImageView!
+    private var exampleImage2: UIImageView!
 
     private func setupUI() {
         // Update label for step
@@ -122,6 +125,15 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         parentImageView?.translatesAutoresizingMaskIntoConstraints = false
         uploadArea.addSubview(parentImageView)
         
+        resetParentImageButton = UIButton(type: .system)
+        resetParentImageButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
+        resetParentImageButton.tintColor = .white
+        resetParentImageButton.addTarget(self, action: #selector(resetImageTapped), for: .touchUpInside)
+        resetParentImageButton.translatesAutoresizingMaskIntoConstraints = false
+        uploadArea.addSubview(resetParentImageButton)
+        
+        resetParentImageButton.isHidden = true
+        
         // "or" Label
         let orLabel = UILabel()
         orLabel.text = "or"
@@ -149,22 +161,27 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         exampleStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(exampleStack)
 
-        let example1 = UIImageView(image: UIImage(systemName: "person.circle"))
-        example1.tintColor = .white
-        example1.backgroundColor = UIColor(white: 0.2, alpha: 1)
-        example1.layer.cornerRadius = 36
-        example1.clipsToBounds = true
-        example1.contentMode = .scaleAspectFill
-        example1.translatesAutoresizingMaskIntoConstraints = false
-        exampleStack.addArrangedSubview(example1)
-        let example2 = UIImageView(image: UIImage(systemName: "person.circle.fill"))
-        example2.tintColor = .white
-        example2.backgroundColor = UIColor(white: 0.2, alpha: 1)
-        example2.layer.cornerRadius = 36
-        example2.clipsToBounds = true
-        example2.contentMode = .scaleAspectFill
-        example2.translatesAutoresizingMaskIntoConstraints = false
-        exampleStack.addArrangedSubview(example2)
+        exampleImage1 = UIImageView(image: UIImage(systemName: "person.circle"))
+        exampleImage1.tintColor = .white
+        exampleImage1.backgroundColor = UIColor(white: 0.2, alpha: 1)
+        exampleImage1.layer.cornerRadius = 36
+        exampleImage1.clipsToBounds = true
+        exampleImage1.contentMode = .scaleAspectFill
+        exampleImage1.translatesAutoresizingMaskIntoConstraints = false
+        exampleImage1.isUserInteractionEnabled = true
+        exampleImage1.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(exampleImage1Tapped)))
+        exampleStack.addArrangedSubview(exampleImage1)
+        
+        exampleImage2 = UIImageView(image: UIImage(systemName: "person.circle.fill"))
+        exampleImage2.tintColor = .white
+        exampleImage2.backgroundColor = UIColor(white: 0.2, alpha: 1)
+        exampleImage2.layer.cornerRadius = 36
+        exampleImage2.clipsToBounds = true
+        exampleImage2.contentMode = .scaleAspectFill
+        exampleImage2.isUserInteractionEnabled = true
+        exampleImage2.translatesAutoresizingMaskIntoConstraints = false
+        exampleImage2.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(exampleImage2Tapped)))
+        exampleStack.addArrangedSubview(exampleImage2)
 
         // Continue Button
         let continueButton = UIButton(type: .system)
@@ -193,9 +210,9 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
             uploadArea.topAnchor.constraint(equalTo: progressStack.bottomAnchor, constant: 48),
             uploadArea.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             uploadArea.widthAnchor.constraint(equalToConstant: 280),
-            uploadArea.heightAnchor.constraint(equalToConstant: 220),
+            uploadArea.heightAnchor.constraint(equalToConstant: 250),
 
-            uploadIcon.topAnchor.constraint(equalTo: uploadArea.topAnchor, constant: 32),
+            uploadIcon.topAnchor.constraint(equalTo: uploadArea.topAnchor, constant: 42),
             uploadIcon.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
             uploadIcon.widthAnchor.constraint(equalToConstant: 44),
             uploadIcon.heightAnchor.constraint(equalToConstant: 44),
@@ -203,14 +220,17 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
             parentLabel.topAnchor.constraint(equalTo: uploadIcon.bottomAnchor, constant: 12),
             parentLabel.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
 
-            plusButton.topAnchor.constraint(equalTo: parentLabel.bottomAnchor, constant: 16),
+            plusButton.topAnchor.constraint(equalTo: parentLabel.bottomAnchor, constant: 26),
             plusButton.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
-            plusButton.widthAnchor.constraint(equalToConstant: 36),
-            plusButton.heightAnchor.constraint(equalToConstant: 36),
+            plusButton.widthAnchor.constraint(equalToConstant: 44),
+            plusButton.heightAnchor.constraint(equalToConstant: 44),
 
             parentImageView.widthAnchor.constraint(equalTo: uploadArea.widthAnchor),
             parentImageView.heightAnchor.constraint(equalTo: uploadArea.heightAnchor),
             parentImageView.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
+            
+            resetParentImageButton.trailingAnchor.constraint(equalTo: uploadArea.trailingAnchor, constant: -10),
+            resetParentImageButton.bottomAnchor.constraint(equalTo: uploadArea.bottomAnchor, constant: -10),
             
             orLabel.topAnchor.constraint(equalTo: uploadArea.bottomAnchor, constant: 32),
             orLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -220,10 +240,10 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
 
             exampleStack.topAnchor.constraint(equalTo: chooseLabel.bottomAnchor, constant: 16),
             exampleStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            example1.widthAnchor.constraint(equalToConstant: 72),
-            example1.heightAnchor.constraint(equalToConstant: 72),
-            example2.widthAnchor.constraint(equalToConstant: 72),
-            example2.heightAnchor.constraint(equalToConstant: 72),
+            exampleImage1.widthAnchor.constraint(equalToConstant: 72),
+            exampleImage1.heightAnchor.constraint(equalToConstant: 72),
+            exampleImage2.widthAnchor.constraint(equalToConstant: 72),
+            exampleImage2.heightAnchor.constraint(equalToConstant: 72),
 
             continueButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             continueButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -233,6 +253,14 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
     }
 
     // MARK: - IBActions
+    @objc private func exampleImage1Tapped() {
+        showSelecetedImage(exampleImage1.image ?? UIImage())
+    }
+    
+    @objc private func exampleImage2Tapped() {
+        showSelecetedImage(exampleImage2.image ?? UIImage())
+    }
+    
     @objc private func plusButtonTapped() {
         let picker = UIImagePickerController()
         picker.delegate = self
@@ -257,21 +285,31 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         }
     }
     
+    @objc private func resetImageTapped() {
+        uploadIcon.isHidden = false
+        plusButton.isHidden = false
+        parentLabel.isHidden = false
+        resetParentImageButton.isHidden = true
+        parentImageView.image = nil
+    }
+    
+    private func showSelecetedImage(_ image: UIImage) {
+        uploadIcon.isHidden = true
+        plusButton.isHidden = true
+        parentLabel.isHidden = true
+        resetParentImageButton.isHidden = false
+        parentImageView.image = image
+    }
+    
     // MARK: - UIImagePickerControllerDelegate
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
         if let image = info[.originalImage] as? UIImage {
-            showUploadedImage(image)
+            showSelecetedImage(image)
         }
     }
+    
     public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
-    }
-    
-    private func showUploadedImage(_ image: UIImage) {
-        uploadIcon.isHidden = true
-        plusButton.isHidden = true
-        parentLabel.isHidden = true
-        parentImageView.image = image
     }
 }
