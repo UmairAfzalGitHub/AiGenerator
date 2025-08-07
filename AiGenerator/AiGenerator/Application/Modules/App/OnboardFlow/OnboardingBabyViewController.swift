@@ -11,6 +11,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
     enum ProgressStep {
         case first
         case second
+        case result
     }
     private var currentStep: ProgressStep = .first
     
@@ -30,12 +31,21 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
     private var uploadIcon: UIImageView!
     private var plusButton: UIButton!
     private var resetParentImageButton: UIButton!
+    private var continueButton: UIButton!
     private var parentImageView: UIImageView!
     private var progressDot1: UIView!
     private var progressDot2: UIView!
     private var parentLabel: UILabel!
     private var exampleImage1: UIImageView!
     private var exampleImage2: UIImageView!
+    // Skin Type UI
+    private var skinTypeLabel: UILabel!
+    private var skinTypeStack: UIStackView!
+    private var skinTypeButtons: [UIButton] = []
+    // Example/Or UI
+    private var orLabel: UILabel!
+    private var chooseLabel: UILabel!
+    private var exampleStack: UIStackView!
 
     private func setupUI() {
         // Update label for step
@@ -118,7 +128,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         uploadArea.addSubview(plusButton)
 
-        parentImageView = UIImageView()
+        parentImageView = UIImageView(image: nil)
         parentImageView?.contentMode = .scaleAspectFill
         parentImageView?.clipsToBounds = true
         parentImageView?.layer.cornerRadius = 16
@@ -135,7 +145,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         resetParentImageButton.isHidden = true
         
         // "or" Label
-        let orLabel = UILabel()
+        orLabel = UILabel()
         orLabel.text = "or"
         orLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         orLabel.textColor = UIColor(white: 0.7, alpha: 1)
@@ -144,7 +154,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         view.addSubview(orLabel)
 
         // Choose from example photos label
-        let chooseLabel = UILabel()
+        chooseLabel = UILabel()
         chooseLabel.text = "Choose from example photos"
         chooseLabel.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         chooseLabel.textColor = UIColor(white: 0.7, alpha: 1)
@@ -153,7 +163,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         view.addSubview(chooseLabel)
 
         // Example Parent Photos
-        let exampleStack = UIStackView()
+        exampleStack = UIStackView()
         exampleStack.axis = .horizontal
         exampleStack.alignment = .center
         exampleStack.distribution = .equalSpacing
@@ -183,11 +193,54 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         exampleImage2.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(exampleImage2Tapped)))
         exampleStack.addArrangedSubview(exampleImage2)
 
+        // Skin Type Label (hidden by default)
+        skinTypeLabel = UILabel()
+        skinTypeLabel.text = "Skin Type"
+        skinTypeLabel.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        skinTypeLabel.textColor = .white
+        skinTypeLabel.textAlignment = .center
+        skinTypeLabel.translatesAutoresizingMaskIntoConstraints = false
+        skinTypeLabel.isHidden = true
+        view.addSubview(skinTypeLabel)
+
+        // Skin Type Stack (hidden by default)
+        skinTypeStack = UIStackView()
+        skinTypeStack.axis = .horizontal
+        skinTypeStack.alignment = .center
+        skinTypeStack.distribution = .equalSpacing
+        skinTypeStack.spacing = 16
+        skinTypeStack.translatesAutoresizingMaskIntoConstraints = false
+        skinTypeStack.isHidden = true
+        view.addSubview(skinTypeStack)
+
+        let skinTypeImages = ["hand.raised.fill", "hand.raised.fill", "hand.raised.fill", "hand.raised.fill"]
+        let skinColors: [UIColor] = [
+            UIColor(red: 1.0, green: 0.88, blue: 0.78, alpha: 1.0), // light
+            UIColor(red: 0.85, green: 0.65, blue: 0.45, alpha: 1.0), // tan
+            UIColor(red: 0.60, green: 0.40, blue: 0.25, alpha: 1.0), // brown
+            UIColor(red: 0.30, green: 0.20, blue: 0.13, alpha: 1.0)  // dark
+        ]
+        for (i, imageName) in skinTypeImages.enumerated() {
+            let button = UIButton(type: .system)
+            let config = UIImage.SymbolConfiguration(pointSize: 32, weight: .regular)
+            let image = UIImage(systemName: imageName, withConfiguration: config)?.withRenderingMode(.alwaysTemplate)
+            button.setImage(image, for: .normal)
+            button.tintColor = skinColors[i]
+            button.backgroundColor = UIColor(white: 0.12, alpha: 1)
+            button.layer.cornerRadius = 22
+            button.clipsToBounds = true
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.widthAnchor.constraint(equalToConstant: 44).isActive = true
+            button.heightAnchor.constraint(equalToConstant: 44).isActive = true
+            skinTypeStack.addArrangedSubview(button)
+            skinTypeButtons.append(button)
+        }
+
         // Continue Button
-        let continueButton = UIButton(type: .system)
+        continueButton = UIButton(type: .system)
         continueButton.setTitle("Continue", for: .normal)
         continueButton.setTitleColor(.black, for: .normal)
-        continueButton.backgroundColor = UIColor(white: 0.9, alpha: 1)
+        continueButton.backgroundColor = UIColor(white: 0.5, alpha: 1)
         continueButton.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         continueButton.layer.cornerRadius = 24
         continueButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
@@ -222,8 +275,8 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
 
             plusButton.topAnchor.constraint(equalTo: parentLabel.bottomAnchor, constant: 26),
             plusButton.centerXAnchor.constraint(equalTo: uploadArea.centerXAnchor),
-            plusButton.widthAnchor.constraint(equalToConstant: 44),
-            plusButton.heightAnchor.constraint(equalToConstant: 44),
+            plusButton.widthAnchor.constraint(equalToConstant: 56),
+            plusButton.heightAnchor.constraint(equalToConstant: 56),
 
             parentImageView.widthAnchor.constraint(equalTo: uploadArea.widthAnchor),
             parentImageView.heightAnchor.constraint(equalTo: uploadArea.heightAnchor),
@@ -244,6 +297,13 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
             exampleImage1.heightAnchor.constraint(equalToConstant: 72),
             exampleImage2.widthAnchor.constraint(equalToConstant: 72),
             exampleImage2.heightAnchor.constraint(equalToConstant: 72),
+
+            // Skin Type Label and Stack
+            skinTypeLabel.topAnchor.constraint(equalTo: uploadArea.bottomAnchor, constant: 24),
+            skinTypeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            skinTypeStack.topAnchor.constraint(equalTo: skinTypeLabel.bottomAnchor, constant: 12),
+            skinTypeStack.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            skinTypeStack.heightAnchor.constraint(equalToConstant: 44),
 
             continueButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -24),
             continueButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -270,7 +330,13 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
     
     @objc private func continueButtonTapped() {
         // Push a new instance with .second step
-        let nextVC = OnboardingBabyViewController(step: .second)
+        guard parentImageView.image != nil else { return }
+        var nextVC = UIViewController()
+        if currentStep == .first {
+            nextVC = OnboardingBabyViewController(step: .second)
+        } else if currentStep == .second {
+            nextVC = OnboardingBabyViewController(step: .second)
+        }
         navigationController?.pushViewController(nextVC, animated: true)
     }
     
@@ -282,6 +348,8 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         case .second:
             progressDot1.backgroundColor = UIColor(white: 0.2, alpha: 1)
             progressDot2.backgroundColor = .white
+        case .result
+            : break
         }
     }
     
@@ -291,6 +359,10 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         parentLabel.isHidden = false
         resetParentImageButton.isHidden = true
         parentImageView.image = nil
+        // Show or/choose/example, hide skin type
+        setSkinTypeAndExampleVisibility(imageSet: false)
+        continueButton.isUserInteractionEnabled = false
+        continueButton.backgroundColor = UIColor(white: 0.5, alpha: 1)
     }
     
     private func showSelecetedImage(_ image: UIImage) {
@@ -299,6 +371,18 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         parentLabel.isHidden = true
         resetParentImageButton.isHidden = false
         parentImageView.image = image
+        // Hide or/choose/example, show skin type
+        setSkinTypeAndExampleVisibility(imageSet: true)
+        continueButton.backgroundColor = UIColor(white: 0.9, alpha: 1)
+    }
+    
+    // Helper to toggle skin type/example/or/choose UI
+    private func setSkinTypeAndExampleVisibility(imageSet: Bool) {
+        orLabel?.isHidden = imageSet
+        chooseLabel?.isHidden = imageSet
+        exampleStack?.isHidden = imageSet
+        skinTypeLabel?.isHidden = !imageSet
+        skinTypeStack?.isHidden = !imageSet
     }
     
     // MARK: - UIImagePickerControllerDelegate
