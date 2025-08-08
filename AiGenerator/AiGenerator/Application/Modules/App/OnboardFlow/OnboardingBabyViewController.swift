@@ -335,7 +335,11 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         if currentStep == .first {
             nextVC = OnboardingBabyViewController(step: .second)
         } else if currentStep == .second {
-            nextVC = OnboardingBabyViewController(step: .second)
+            nextVC = IAPViewController()
+            nextVC.modalPresentationStyle = .fullScreen
+            nextVC.modalTransitionStyle = .coverVertical
+            self.present(nextVC, animated: true)
+            return
         }
         navigationController?.pushViewController(nextVC, animated: true)
     }
