@@ -15,7 +15,7 @@ enum CellCorner {
     case all
 }
 
-class BaseViewController: UIViewController, IAPViewControllerDelegate {
+class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate {
 
     private var loaderVC: LoaderViewController?
     private var bannerAdId: AdMobId?
@@ -93,7 +93,7 @@ class BaseViewController: UIViewController, IAPViewControllerDelegate {
     }
     
     func showIAP() {
-        let iapVarientA = IAPViewController()
+        let iapVarientA = IAPOnboardingViewController()
         iapVarientA.delegate = self
         iapVC = iapVarientA
 
@@ -377,5 +377,9 @@ class BaseViewController: UIViewController, IAPViewControllerDelegate {
     //MARK: - IAPViewControllerDelegate
     func performAction() {
         print("Perform IAP Action")
+    }
+    
+    func cancelAction() {
+        print("Cancel IAP Action")
     }
 }

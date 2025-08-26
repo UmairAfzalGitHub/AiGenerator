@@ -9,17 +9,17 @@ import UIKit
 import Lottie
 import StoreKit
 
-protocol IAPViewControllerDelegate {
+protocol IAPOnboardingViewControllerDelegate {
     func performAction()
     func cancelAction()
 }
 
-class IAPViewController: UIViewController {
+class IAPOnboardingViewController: UIViewController {
     
     // MARK: - Properties
     private var monthlyProduct: SKProduct?
     private var yearlyProduct: SKProduct?
-    var delegate: IAPViewControllerDelegate?
+    var delegate: IAPOnboardingViewControllerDelegate?
     
     private var selectedPlan: PlanType = .monthly
     
@@ -142,18 +142,7 @@ class IAPViewController: UIViewController {
         label.numberOfLines = 0
         return label
     }()
-    
-//    private lazy var descriptionLabel: UILabel = {
-//        let label = UILabel()
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        label.text = "Unlock all premium features and enjoy unlimited access"
-//        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-//        label.textColor = .secondaryLabel
-//        label.textAlignment = .center
-//        label.numberOfLines = 0
-//        return label
-//    }()
-//    
+      
     private lazy var featuresStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -275,10 +264,34 @@ class IAPViewController: UIViewController {
         indicator.hidesWhenStopped = true
         return indicator
     }()
-        
+    
+    private lazy var loadingView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .black
+        view.layer.cornerRadius = 8
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
+    private lazy var loadingLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Loading..."
+        label.font = UIFont.systemFont(ofSize: 34, weight: .semibold)
+        label.textColor = .white
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.layer.masksToBounds = true
+        return label
+    }()
+    
+    var timer: Timer?
+    var currentValue = 0
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        startCounting()
         setupUI()
         setupLoopingImages()
         setupConstraints()
@@ -333,6 +346,34 @@ class IAPViewController: UIViewController {
         footerStackView.addArrangedSubview(privacyButton)
         
         view.addSubview(loadingIndicator)
+        view.addSubview(loadingView)
+        loadingView.addSubview(loadingLabel)
+    }
+    
+    func startCounting() {
+        currentValue = 0
+        loadingLabel.text = "0%"
+
+        // 6 seconds total / 100 steps = 0.06s per step
+        timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { [weak self] t in
+            guard let self = self else { return }
+            if self.currentValue <= 100 {
+                self.loadingLabel.text = "\(self.currentValue) %"
+                self.currentValue += 1
+            } else {
+                t.invalidate()
+                self.performActionAfterCounting()
+            }
+        }
+    }
+
+    func performActionAfterCounting() {
+        UIView.animate(withDuration: 0.3, animations: {
+               self.loadingView.alpha = 0
+           }, completion: { _ in
+               self.loadingView.isHidden = true
+               self.loadingView.alpha = 1   // reset so it’s ready if shown again
+           })
     }
     
     private func setupLoopingImages() {
@@ -458,7 +499,17 @@ class IAPViewController: UIViewController {
             
             // Loading Indicator
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            loadingView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loadingView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            loadingView.topAnchor.constraint(equalTo: view.topAnchor),
+            loadingView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            loadingLabel.centerXAnchor.constraint(equalTo: loadingView.centerXAnchor),
+            loadingLabel.centerYAnchor.constraint(equalTo: loadingView.centerYAnchor, constant: -30),
+            loadingLabel.leadingAnchor.constraint(equalTo: loadingView.leadingAnchor, constant: 16),
+            loadingView.trailingAnchor.constraint(equalTo: loadingView.leadingAnchor, constant: -16)
         ])
     }
     
@@ -679,7 +730,7 @@ class IAPViewController: UIViewController {
 }
 
 // MARK: - Alternative implementation with CABasicAnimation for smoother performance
-extension IAPViewController {
+extension IAPOnboardingViewController {
     
     private func startLoopingAnimationWithCAAnimation() {
         // Stop any existing animations
@@ -724,7 +775,7 @@ extension IAPViewController {
 }
 
 // MARK: - Usage example with custom configuration
-extension IAPViewController {
+extension IAPOnboardingViewController {
     
     func configureLooping(duration: TimeInterval = 3.0, direction: ScrollDirection = .leftToRight) {
         // You can call this method to customize the looping behavior
@@ -736,129 +787,5 @@ extension IAPViewController {
         case rightToLeft
         case topToBottom
         case bottomToTop
-    }
-}
-
-// MARK: - PlanView Class
-class PlanView: UIView {
-    
-    private lazy var containerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 12
-        view.layer.borderWidth = 1.5
-        view.layer.borderColor = UIColor.textSecondary.cgColor
-        view.backgroundColor = .clear
-        return view
-    }()
-    
-    private lazy var selectionImage: UIImageView = {
-        let image = UIImageView()
-        image.image = UIImage(named: "checkmark-unselected")
-        image.translatesAutoresizingMaskIntoConstraints = false
-        return image
-    }()
-    
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
-        label.textColor = .white
-        return label
-    }()
-    
-    private lazy var priceLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
-        label.textColor = .white
-        return label
-    }()
-    
-    private lazy var periodLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .textSecondary
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupUI()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupUI()
-    }
-    
-    private func setupUI() {
-        addSubview(containerView)
-        containerView.addSubview(selectionImage)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(priceLabel)
-        containerView.addSubview(periodLabel)
-        
-        NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: topAnchor),
-            containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            
-            selectionImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
-            selectionImage.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            selectionImage.widthAnchor.constraint(equalToConstant: 16),
-            selectionImage.heightAnchor.constraint(equalToConstant: 16),
-            
-            titleLabel.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 12),
-            titleLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            
-            periodLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
-            periodLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            
-            priceLabel.trailingAnchor.constraint(equalTo: periodLabel.leadingAnchor, constant: -4),
-            priceLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: priceLabel.leadingAnchor, constant: -8)
-        ])
-    }
-    
-    func configure(title: String, price: String, period: String) {
-        titleLabel.text = title
-        priceLabel.text = price
-        periodLabel.text = "/\(period)"
-    }
-    
-    func setSelected(_ selected: Bool) {
-        UIView.animate(withDuration: 0.3) {
-            var selectionImg = !selected ? UIImage(named: "checkmark-unselected") : UIImage(named: "checkmark-selected")
-            self.selectionImage.image = selectionImg
-            self.containerView.layer.borderColor = selected ? UIColor.appPrimary.cgColor : UIColor.textSecondary.cgColor
-            self.containerView.backgroundColor = selected ? UIColor.appPrimary.withAlphaComponent(0.1) : .clear
-        }
-    }
-}
-
-
-class GradientButton: UIButton {
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        addGradient()
-    }
-    
-    private func addGradient() {
-        guard bounds.width > 0 && bounds.height > 0 else { return }
-        
-        layer.sublayers?.removeAll { $0 is CAGradientLayer }
-        
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [UIColor.systemCyan.cgColor, UIColor.systemTeal.cgColor]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0.25)
-        gradientLayer.endPoint = CGPoint(x: 0.88, y: 0.5)
-        gradientLayer.frame = bounds
-        gradientLayer.cornerRadius = 8
-        
-        layer.insertSublayer(gradientLayer, at: 0)
     }
 }
