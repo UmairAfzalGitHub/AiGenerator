@@ -14,6 +14,7 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         case result
     }
     private var currentStep: ProgressStep = .first
+    private var selectedSkinTypeIndex: Int? = nil
     
     convenience init(step: ProgressStep = .first) {
         self.init()
@@ -228,8 +229,12 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
             button.tintColor = skinColors[i]
             button.backgroundColor = UIColor(white: 0.12, alpha: 1)
             button.layer.cornerRadius = 22
+            button.layer.borderWidth = 2
+            button.layer.borderColor = UIColor.clear.cgColor
             button.clipsToBounds = true
             button.translatesAutoresizingMaskIntoConstraints = false
+            button.tag = i // Set tag to identify the button
+            button.addTarget(self, action: #selector(skinTypeButtonTapped(_:)), for: .touchUpInside)
             button.widthAnchor.constraint(equalToConstant: 44).isActive = true
             button.heightAnchor.constraint(equalToConstant: 44).isActive = true
             skinTypeStack.addArrangedSubview(button)
@@ -328,6 +333,14 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         present(picker, animated: true)
     }
     
+    @objc private func skinTypeButtonTapped(_ sender: UIButton) {
+        // Update selected skin type index
+        selectedSkinTypeIndex = sender.tag
+        
+        // Update button appearances
+        updateSkinTypeSelection()
+    }
+    
     @objc private func continueButtonTapped() {
         // Push a new instance with .second step
         guard parentImageView.image != nil else { return }
@@ -352,8 +365,19 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         case .second:
             progressDot1.backgroundColor = UIColor(white: 0.2, alpha: 1)
             progressDot2.backgroundColor = .white
-        case .result
-            : break
+        case .result: break
+        }
+    }
+    
+    private func updateSkinTypeSelection() {
+        for (index, button) in skinTypeButtons.enumerated() {
+            if index == selectedSkinTypeIndex {
+                // Selected state - show white border
+                button.layer.borderColor = UIColor.white.cgColor
+            } else {
+                // Unselected state - clear border
+                button.layer.borderColor = UIColor.clear.cgColor
+            }
         }
     }
     
@@ -363,7 +387,9 @@ class OnboardingBabyViewController: BaseViewController, UIImagePickerControllerD
         parentLabel.isHidden = false
         resetParentImageButton.isHidden = true
         parentImageView.image = nil
-        // Show or/choose/example, hide skin type
+        // Reset skin type selection
+        selectedSkinTypeIndex = nil
+        updateSkinTypeSelection()
         setSkinTypeAndExampleVisibility(imageSet: false)
         continueButton.isUserInteractionEnabled = false
         continueButton.backgroundColor = UIColor(white: 0.5, alpha: 1)
