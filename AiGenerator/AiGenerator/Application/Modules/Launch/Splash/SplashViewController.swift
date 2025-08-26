@@ -47,7 +47,7 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     }
     
     func checkOnboardingStatus() {
-        let homeVC = OnboardingBabyViewController()
+        let homeVC = IAPOnboardingViewController()
 
         let navController = UINavigationController(rootViewController: homeVC)
         navController.navigationBar.isHidden = true
