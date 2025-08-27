@@ -41,20 +41,36 @@ class IAPOnboardingViewController: UIViewController {
         let image = UIImageView()
         image.backgroundColor = .systemGreen
         image.translatesAutoresizingMaskIntoConstraints = false
+        image.layer.cornerRadius = 12
+        image.layer.borderColor = UIColor.gray.cgColor
+        image.layer.borderWidth = 1
         image.isUserInteractionEnabled = false
         image.clipsToBounds = true
-        image.heightAnchor.constraint(equalTo: image.widthAnchor).isActive = true
         image.contentMode = .scaleAspectFill
-               return image
+        return image
     }()
     
     private lazy var selectedParent2Image: UIImageView = {
         let image = UIImageView()
-        image.backgroundColor = .systemPink
+        image.backgroundColor = .systemTeal
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.layer.cornerRadius = 12
+        image.layer.borderColor = UIColor.gray.cgColor
+        image.layer.borderWidth = 1
+        image.isUserInteractionEnabled = false
+        image.clipsToBounds = true
+        image.contentMode = .scaleAspectFill
+        return image
+    }()
+    
+    private lazy var heartImage: UIImageView = {
+        let image = UIImageView()
+        image.image = UIImage(systemName: "heart.fill")
+        image.backgroundColor = .clear
+        image.tintColor = .systemRed
         image.translatesAutoresizingMaskIntoConstraints = false
         image.isUserInteractionEnabled = false
         image.clipsToBounds = true
-        image.heightAnchor.constraint(equalTo: image.widthAnchor).isActive = true
         image.contentMode = .scaleAspectFill
         return image
     }()
@@ -63,31 +79,15 @@ class IAPOnboardingViewController: UIViewController {
         let image = UIImageView()
         image.backgroundColor = .systemGray
         image.translatesAutoresizingMaskIntoConstraints = false
+        image.layer.cornerRadius = 12
+        image.layer.borderColor = UIColor.gray.cgColor
+        image.layer.borderWidth = 1
         image.isUserInteractionEnabled = false
         image.clipsToBounds = true
-        image.heightAnchor.constraint(equalTo: image.widthAnchor).isActive = true
         image.contentMode = .scaleAspectFill
         return image
     }()
     
-    private lazy var mainStackView: UIStackView = {
-       let view = UIStackView()
-        view.axis = .vertical
-        view.distribution = .fillEqually
-        view.spacing = 12
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-    
-    private lazy var selectedImagesStackView: UIStackView = {
-       let view = UIStackView()
-        view.axis = .horizontal
-        view.distribution = .fillEqually
-        view.spacing = 16
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-            
     // MARK: - UI Components
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -158,7 +158,7 @@ class IAPOnboardingViewController: UIViewController {
         label.numberOfLines = 0
         return label
     }()
-      
+    
     private lazy var featuresStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -193,7 +193,7 @@ class IAPOnboardingViewController: UIViewController {
         button.setTitle("Continue", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .clear  // Set to clear since we're using gradient
+        button.backgroundColor = .clear
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
@@ -315,14 +315,6 @@ class IAPOnboardingViewController: UIViewController {
         localize()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-    }
-    
     // MARK: - Setup Methods
     private func setupUI() {
         view.backgroundColor = .black
@@ -332,18 +324,13 @@ class IAPOnboardingViewController: UIViewController {
         contentView.addSubview(topImageContainer)
         contentView.addSubview(backgroundImageView)
         
-        selectedImagesStackView.addArrangedSubview(selectedParent1Image)
-        selectedImagesStackView.addArrangedSubview(selectedParent2Image)
-        
-        mainStackView.addArrangedSubview(selectedImagesStackView)
-        mainStackView.addArrangedSubview(generatedBabyImage)
-        
-        topImageContainer.addSubview(mainStackView)
-        
-        // Add looping image container at the top
+        // Add images directly inside topImageContainer
+        topImageContainer.addSubview(selectedParent1Image)
+        topImageContainer.addSubview(selectedParent2Image)
+        topImageContainer.addSubview(generatedBabyImage)
+        topImageContainer.addSubview(heartImage)
         
         // Add other UI elements
-//        contentView.addSubview(descriptionLabel)
         contentView.addSubview(titleStackView)
         contentView.addSubview(featuresStackView)
         contentView.addSubview(weeklyPlanView)
@@ -355,7 +342,7 @@ class IAPOnboardingViewController: UIViewController {
         
         view.addSubview(continueButton)
         view.addSubview(autoRenewLabel)
-
+        
         titleStackView.addArrangedSubview(titleStartLabel)
         titleStackView.addArrangedSubview(titleContentView)
         titleStackView.addArrangedSubview(titleEndLabel)
@@ -383,11 +370,43 @@ class IAPOnboardingViewController: UIViewController {
                 self.currentValue += 1
             } else {
                 t.invalidate()
+                self.animateImagesIn()
                 self.performActionAfterCounting()
             }
         }
     }
 
+    func animateImagesIn() {
+        // initial positions
+        selectedParent1Image.transform = CGAffineTransform(translationX: -view.bounds.width, y: 0) // left offscreen
+        selectedParent2Image.transform = CGAffineTransform(translationX: view.bounds.width, y: 0)  // right offscreen
+        generatedBabyImage.transform = CGAffineTransform(scaleX: 0.0, y: 0.0) // scaled to 0
+        heartImage.transform = CGAffineTransform(scaleX: 0.0, y: 0.0) // scaled to 0
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            UIView.animate(withDuration: 0.6,
+                           delay: 0,
+                           usingSpringWithDamping: 0.7,
+                           initialSpringVelocity: 0.5,
+                           options: .curveEaseOut,
+                           animations: {
+                self.selectedParent1Image.transform = .identity
+                self.selectedParent2Image.transform = .identity
+            })
+            
+            UIView.animate(withDuration: 0.6,
+                           delay: 0.5,
+                           usingSpringWithDamping: 0.6,
+                           initialSpringVelocity: 0.5,
+                           options: .curveEaseOut,
+                           animations: {
+                self.generatedBabyImage.transform = .identity
+                self.heartImage.transform = .identity
+            })
+        }
+
+    }
+    
     func performActionAfterCounting() {
         UIView.animate(withDuration: 0.3, animations: {
                self.loadingView.alpha = 0
@@ -396,7 +415,6 @@ class IAPOnboardingViewController: UIViewController {
                self.loadingView.alpha = 1   // reset so it’s ready if shown again
            })
     }
-    
     
     private func setupConstraints() {
         let cellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .phone && UIDevice().isSmallDevice ? 54 : 64
@@ -421,17 +439,34 @@ class IAPOnboardingViewController: UIViewController {
             backgroundImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             backgroundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            // Looping Image Container - at the top
-            topImageContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0),
-            topImageContainer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            topImageContainer.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 1),
-            topImageContainer.heightAnchor.constraint(equalTo: topImageContainer.widthAnchor, multiplier: 0.76),
+            // Looping Image Container
+            topImageContainer.topAnchor.constraint(equalTo: contentView.topAnchor),
+            topImageContainer.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            topImageContainer.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            mainStackView.topAnchor.constraint(equalTo: topImageContainer.topAnchor, constant: 20),
-            mainStackView.leadingAnchor.constraint(equalTo: topImageContainer.leadingAnchor, constant: 20),
-            mainStackView.trailingAnchor.constraint(equalTo: topImageContainer.trailingAnchor, constant: -20),
-            mainStackView.bottomAnchor.constraint(equalTo: topImageContainer.bottomAnchor, constant: -20),
-            mainStackView.centerYAnchor.constraint(equalTo: topImageContainer.centerYAnchor),
+            // Parent Image 1
+            selectedParent1Image.topAnchor.constraint(equalTo: topImageContainer.topAnchor, constant: 20),
+            selectedParent1Image.leadingAnchor.constraint(equalTo: topImageContainer.leadingAnchor, constant: 30),
+            selectedParent1Image.widthAnchor.constraint(equalTo: topImageContainer.widthAnchor, multiplier: 0.5, constant: -40),
+            selectedParent1Image.heightAnchor.constraint(equalTo: selectedParent1Image.widthAnchor),
+            
+            // Parent Image 2
+            selectedParent2Image.topAnchor.constraint(equalTo: topImageContainer.topAnchor, constant: 20),
+            selectedParent2Image.trailingAnchor.constraint(equalTo: topImageContainer.trailingAnchor, constant: -30),
+            selectedParent2Image.widthAnchor.constraint(equalTo: topImageContainer.widthAnchor, multiplier: 0.5, constant: -40),
+            selectedParent2Image.heightAnchor.constraint(equalTo: selectedParent2Image.widthAnchor),
+            
+            heartImage.centerXAnchor.constraint(equalTo: topImageContainer.centerXAnchor),
+            heartImage.centerYAnchor.constraint(equalTo: selectedParent2Image.centerYAnchor),
+            heartImage.widthAnchor.constraint(equalTo: topImageContainer.widthAnchor, multiplier: 0.17),
+            heartImage.heightAnchor.constraint(equalTo: heartImage.widthAnchor),
+            
+            // Baby Image
+            generatedBabyImage.topAnchor.constraint(equalTo: selectedParent1Image.bottomAnchor, constant: 16),
+            generatedBabyImage.centerXAnchor.constraint(equalTo: topImageContainer.centerXAnchor),
+            generatedBabyImage.widthAnchor.constraint(equalTo: topImageContainer.widthAnchor, multiplier: 0.5),
+            generatedBabyImage.heightAnchor.constraint(equalTo: generatedBabyImage.widthAnchor),
+            generatedBabyImage.bottomAnchor.constraint(equalTo: topImageContainer.bottomAnchor, constant: -20),
             
             // Title Label
             titleStackView.topAnchor.constraint(equalTo: topImageContainer.bottomAnchor, constant: 20),
@@ -480,13 +515,13 @@ class IAPOnboardingViewController: UIViewController {
             continueButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             continueButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             continueButton.heightAnchor.constraint(equalToConstant: 56),
-
+            
             // Auto Renew Label
             autoRenewLabel.topAnchor.constraint(equalTo: continueButton.bottomAnchor, constant: 4),
             autoRenewLabel.leadingAnchor.constraint(equalTo: continueButton.leadingAnchor),
             autoRenewLabel.trailingAnchor.constraint(equalTo: continueButton.trailingAnchor),
             autoRenewLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4),
-
+            
             
             // Loading Indicator
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -565,8 +600,8 @@ class IAPOnboardingViewController: UIViewController {
     
     private func localize() {
         // Add your localization strings here
-//        titleLabel.text = "Upgrade to Premium" // Strings.Label.upgrade
-//        descriptionLabel.text = "Unlock all premium features and enjoy unlimited access" // Strings.Label.iap_description
+        //        titleLabel.text = "Upgrade to Premium" // Strings.Label.upgrade
+        //        descriptionLabel.text = "Unlock all premium features and enjoy unlimited access" // Strings.Label.iap_description
         termsButton.setTitle("Terms", for: .normal) // Strings.Label.terms
         privacyButton.setTitle("Privacy", for: .normal) // Strings.Label.privacy
         manageButton.setTitle("Manage", for: .normal) // Strings.Label.manage_subs
