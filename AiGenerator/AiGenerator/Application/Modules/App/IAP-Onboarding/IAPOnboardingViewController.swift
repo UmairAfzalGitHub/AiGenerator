@@ -88,6 +88,19 @@ class IAPOnboardingViewController: UIViewController {
         return image
     }()
     
+    private lazy var handImage: UIImageView = {
+        let image = UIImageView()
+        image.tintColor = .white
+        image.image = UIImage(systemName: "hand.rays")
+        image.backgroundColor = .clear
+        image.alpha  = 0.5
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.isUserInteractionEnabled = false
+        image.clipsToBounds = true
+        image.contentMode = .scaleAspectFill
+        return image
+    }()
+    
     // MARK: - UI Components
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -122,7 +135,7 @@ class IAPOnboardingViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Get"
-        label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         label.textColor = .white
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -141,7 +154,7 @@ class IAPOnboardingViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "PRO"
-        label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         label.textColor = .white
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -152,7 +165,7 @@ class IAPOnboardingViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Access"
-        label.font = UIFont.systemFont(ofSize: 22, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 26, weight: .bold)
         label.textColor = .white
         label.textAlignment = .center
         label.numberOfLines = 0
@@ -163,7 +176,7 @@ class IAPOnboardingViewController: UIViewController {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
-        stackView.spacing = 7
+        stackView.spacing = 2
         stackView.distribution = .fillEqually
         return stackView
     }()
@@ -329,6 +342,7 @@ class IAPOnboardingViewController: UIViewController {
         topImageContainer.addSubview(selectedParent2Image)
         topImageContainer.addSubview(generatedBabyImage)
         topImageContainer.addSubview(heartImage)
+        generatedBabyImage.addSubview(handImage)
         
         // Add other UI elements
         contentView.addSubview(titleStackView)
@@ -468,8 +482,13 @@ class IAPOnboardingViewController: UIViewController {
             generatedBabyImage.heightAnchor.constraint(equalTo: generatedBabyImage.widthAnchor),
             generatedBabyImage.bottomAnchor.constraint(equalTo: topImageContainer.bottomAnchor, constant: -20),
             
+            handImage.centerXAnchor.constraint(equalTo: generatedBabyImage.centerXAnchor),
+            handImage.centerYAnchor.constraint(equalTo: generatedBabyImage.centerYAnchor),
+            handImage.widthAnchor.constraint(equalToConstant: 42),
+            handImage.heightAnchor.constraint(equalTo: handImage.widthAnchor),
+            
             // Title Label
-            titleStackView.topAnchor.constraint(equalTo: topImageContainer.bottomAnchor, constant: 20),
+            titleStackView.topAnchor.constraint(equalTo: topImageContainer.bottomAnchor, constant: 16),
             titleStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             titleContentView.heightAnchor.constraint(equalToConstant: 28),
@@ -480,7 +499,7 @@ class IAPOnboardingViewController: UIViewController {
             titleCenterLabel.bottomAnchor.constraint(equalTo: titleContentView.bottomAnchor, constant: -4),
             
             // Features Stack View
-            featuresStackView.topAnchor.constraint(equalTo: titleStackView.bottomAnchor, constant: 20),
+            featuresStackView.topAnchor.constraint(equalTo: titleStackView.bottomAnchor, constant: 16),
             featuresStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             // Weekly Plan
@@ -541,10 +560,10 @@ class IAPOnboardingViewController: UIViewController {
     
     private func setupFeatures() {
         let features = [
-            ("checkmark-iap", "Advanced Editing Tools"),
-            ("checkmark-iap", "Editing and Mixing"),
-            ("checkmark-iap", "No Watermarked Exports"),
-            ("checkmark-iap", "Ad-Free Experience")
+            ("checkmark.shield.fill", "Advanced Editing Tools"),
+            ("checkmark.shield.fill", "Editing and Mixing"),
+            ("checkmark.shield.fill", "No Watermarked Exports"),
+            ("checkmark.shield.fill", "Ad-Free Experience")
         ]
         
         features.forEach { iconName, title in
@@ -559,15 +578,15 @@ class IAPOnboardingViewController: UIViewController {
         
         let iconImageView = UIImageView()
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
-        iconImageView.image = UIImage(named: iconName)
-        iconImageView.tintColor = .systemGreen
+        iconImageView.image = UIImage(systemName: iconName)
+        iconImageView.tintColor = .white
         iconImageView.contentMode = .scaleAspectFit
         
         let titleLabel = UILabel()
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.text = title
         titleLabel.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        titleLabel.textColor = .label
+        titleLabel.textColor = .white
         
         containerView.addSubview(iconImageView)
         containerView.addSubview(titleLabel)
