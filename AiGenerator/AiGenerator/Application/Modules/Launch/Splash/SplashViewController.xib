@@ -55,7 +55,7 @@
                         </label>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Oo9-MI-obY" customClass="AppButton" customModule="AiGenerator" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="65" width="400" height="52"/>
-                            <color key="backgroundColor" name="app-green-medium"/>
+                            <color key="backgroundColor" systemColor="systemMintColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="52" id="Xbc-o7-hfN"/>
                             </constraints>
@@ -126,6 +126,9 @@
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemMintColor">
+            <color red="0.0" green="0.78039215689999997" blue="0.74509803919999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

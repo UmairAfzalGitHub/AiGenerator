@@ -1,7 +1,7 @@
 
 import UIKit
 import Lottie
-import IOS_Helpers
+//import IOS_Helpers
 
 class SplashViewController: UIViewController, UITextViewDelegate {
     
@@ -47,8 +47,8 @@ class SplashViewController: UIViewController, UITextViewDelegate {
     }
     
     func checkOnboardingStatus() {
-        let homeVC = IAPOnboardingViewController()
-
+        let homeVC = OnboardingBabyViewController()
+        
         let navController = UINavigationController(rootViewController: homeVC)
         navController.navigationBar.isHidden = true
         UIApplication.shared.updateRootViewController(to: navController)
