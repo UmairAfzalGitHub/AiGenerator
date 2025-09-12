@@ -43,9 +43,33 @@ class LanguageViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        title = "Language"
+        title = "Select Language"
         setupCollectionView()
         setupLayout()
+        setupNavigationButton()
+    }
+    
+    // MARK: - Setup Navigation Button
+    private func setupNavigationButton() {
+        // Initially hide the button
+        navigationItem.rightBarButtonItem = nil
+    }
+    
+    private func updateNavigationButton() {
+        if selectedIndex != nil {
+            // Show the button when a language is selected
+            let selectButton = UIBarButtonItem(
+                title: "Select",
+                style: .done,
+                target: self,
+                action: #selector(didTapSelect)
+            )
+            selectButton.tintColor = .appPrimary
+            navigationItem.rightBarButtonItem = selectButton
+        } else {
+            // Hide the button when no language is selected
+            navigationItem.rightBarButtonItem = nil
+        }
     }
     
     // MARK: - Setup Collection View
@@ -75,7 +99,6 @@ class LanguageViewController: BaseViewController {
         ])
     }
     
-    
     @objc private func didTapSelect() {
         if let selectedIndex = selectedIndex {
             selectLanguage(indexNo: selectedIndex)
@@ -92,7 +115,7 @@ class LanguageViewController: BaseViewController {
         }
         
         UserDefaults.standard.set(true, forKey: "isOnboardingComplete")
-
+        
         if AdManager.shared.splashInterstitial == true {
             if AdManager.shared.splashInterstitial {
                 AdManager.shared.adCounter = AdManager.shared.maxInterstitalAdCounter
@@ -127,6 +150,9 @@ extension LanguageViewController: UICollectionViewDataSource, UICollectionViewDe
         var reloads: [IndexPath] = [indexPath]
         if let prev = previous { reloads.append(prev) }
         collectionView.reloadItems(at: reloads)
+        
+        // Update navigation button visibility
+        updateNavigationButton()
     }
     
     // Grid layout 2 columns
@@ -139,7 +165,7 @@ extension LanguageViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func selectLanguage(indexNo : IndexPath) {
         let diplayLangArray = languages
-
+        
         print(diplayLangArray[indexNo.row].title)
         self.selected = diplayLangArray[indexNo.row].title
         
@@ -152,7 +178,7 @@ extension LanguageViewController: UICollectionViewDataSource, UICollectionViewDe
 
 // MARK: - Custom Cell
 class LanguageCell: UICollectionViewCell {
-
+    
     private let cellContentView = UIView()
     private let flagImageView = UIImageView()
     private let nameLabel = UILabel()
@@ -168,14 +194,13 @@ class LanguageCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        // Setup content container (border + radius only, no shadow here)
-        cellContentView.layer.cornerRadius = 7
+        cellContentView.layer.cornerRadius = 12
         cellContentView.layer.borderColor = UIColor.systemGray.cgColor
         cellContentView.layer.borderWidth = 1
         cellContentView.backgroundColor = .black
         cellContentView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(cellContentView)
-
+        
         flagImageView.contentMode = .scaleAspectFit
         flagImageView.clipsToBounds = true
         flagImageView.layer.cornerRadius = 4
@@ -226,7 +251,7 @@ class LanguageCell: UICollectionViewCell {
         if isSelected {
             cellContentView.layer.borderColor = UIColor.appPrimary.cgColor
             cellContentView.layer.borderWidth = 1.5
-
+            
         } else {
             cellContentView.layer.borderColor = UIColor.systemGray.cgColor
             cellContentView.layer.borderWidth = 1
