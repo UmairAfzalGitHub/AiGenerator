@@ -13,5 +13,6 @@ class AgingViewController: BaseViewController {
         super.viewDidLoad()
 
         title = "Aging"
+        setupNavigationBar()
     }
 }

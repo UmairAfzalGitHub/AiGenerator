@@ -228,10 +228,6 @@ extension SettingsViewController: UITableViewDelegate {
         switch item.title {
         case "Language":
             handleLanguageSelection()
-        case "Templates":
-            handleTemplatesSelection()
-        case "My Creations":
-            handleMyCreationsSelection()
         case "Share":
             handleShareSelection()
         case "Privacy Policy":
@@ -249,20 +245,8 @@ extension SettingsViewController: UITableViewDelegate {
     
     // MARK: - Selection Handlers
     private func handleLanguageSelection() {
-        print("Language selected")
-        // Navigate to language selection screen
-    }
-    
-    private func handleTemplatesSelection() {
-        print("Templates selected")
-        navigationController?.popViewController(animated: true)
-        tabBarController?.selectedIndex = 1
-    }
-    
-    private func handleMyCreationsSelection() {
-        print("My Creations selected")
-        navigationController?.popViewController(animated: true)
-        tabBarController?.selectedIndex = 2
+        let languageVC = LanguageViewController()
+        navigationController?.pushViewController(languageVC, animated: true)
     }
     
     private func handleShareSelection() {

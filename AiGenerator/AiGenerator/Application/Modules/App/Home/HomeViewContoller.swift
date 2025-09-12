@@ -25,6 +25,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     private let fatherPlus = UIButton(type: .system)
     private let motherPlus = UIButton(type: .system)
     
+    // Section: Baby Name
+    private let babyNameTitle = UILabel()
+    private let babyNameTextField = UITextField()
+    
     // Section: Select Baby's Gender
     private let genderTitle = UILabel()
     private let genderStack = UIStackView()
@@ -54,8 +58,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         super.viewDidLoad()
         view.backgroundColor = .black
         title = "Generate"
+        setupNavigationBar()
         setupScrollHierarchy()
         setupParentsSection()
+        setupBabyNameSection()
         setupGenderSection()
         setupEthnicitySection()
         setupGenerateButton()
@@ -178,6 +184,48 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         ])
     }
     
+    private func setupBabyNameSection() {
+        babyNameTitle.text = "Baby Name"
+        babyNameTitle.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        babyNameTitle.textColor = .white
+        babyNameTitle.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(babyNameTitle)
+        
+        babyNameTextField.placeholder = "Baby Emma"
+        babyNameTextField.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        babyNameTextField.textColor = .white
+        babyNameTextField.backgroundColor = UIColor(white: 0.12, alpha: 1)
+        babyNameTextField.layer.cornerRadius = 16
+        babyNameTextField.layer.borderWidth = 0
+        
+        // Configure placeholder color
+        babyNameTextField.attributedPlaceholder = NSAttributedString(
+            string: "Baby Emma",
+            attributes: [NSAttributedString.Key.foregroundColor: UIColor(white: 0.6, alpha: 1)]
+        )
+        
+        // Add padding to text field
+        let paddingView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: babyNameTextField.frame.height))
+        babyNameTextField.leftView = paddingView
+        babyNameTextField.leftViewMode = .always
+        babyNameTextField.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: babyNameTextField.frame.height))
+        babyNameTextField.rightViewMode = .always
+        
+        babyNameTextField.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(babyNameTextField)
+        
+        NSLayoutConstraint.activate([
+            babyNameTitle.topAnchor.constraint(equalTo: parentsGrid.bottomAnchor, constant: 36),
+            babyNameTitle.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            babyNameTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            babyNameTextField.topAnchor.constraint(equalTo: babyNameTitle.bottomAnchor, constant: 12),
+            babyNameTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            babyNameTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            babyNameTextField.heightAnchor.constraint(equalToConstant: 56)
+        ])
+    }
+    
     private func setupGenderSection() {
         genderTitle.text = "Select Baby's Gender"
         genderTitle.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
@@ -190,7 +238,7 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         genderStack.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(genderStack)
         
-        randomButton.configure(text: "Random", systemIcon: "shuffle", isSelected: true)
+        randomButton.configure(text: "Surprise Me", systemIcon: "sparkles", isSelected: true)
         girlButton.configure(text: "Girl", systemIcon: "f.circle")
         boyButton.configure(text: "Boy", systemIcon: "m.circle")
         
@@ -213,7 +261,7 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         genderStack.addArrangedSubview(bottomRow)
         
         NSLayoutConstraint.activate([
-            genderTitle.topAnchor.constraint(equalTo: parentsGrid.bottomAnchor, constant: 36),
+            genderTitle.topAnchor.constraint(equalTo: babyNameTextField.bottomAnchor, constant: 36),
             genderTitle.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             genderTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -527,7 +575,7 @@ private class GradientActionButton: UIButton {
     }
     
     private func setup() {
-        layer.cornerRadius = 24
+        layer.cornerRadius = 28
         clipsToBounds = true
         gradient.colors = [
             UIColor(red: 94/255, green: 150/255, blue: 255/255, alpha: 1).cgColor,

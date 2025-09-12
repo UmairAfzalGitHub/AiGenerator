@@ -49,7 +49,6 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate,
         setup()
         style()
         view.backgroundColor = .black
-        setupNavigationBar()
         setupStandardBackButton()
     }
     
@@ -378,20 +377,23 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate,
 
     // MARK: - Navigation Button Actions
     @objc private func didTapHelp() {
-        // Handle help button tap
-        print("Help button tapped")
         let helpVC = HelpViewController()
+        if let sheet = helpVC.sheetPresentationController {
+            // Show grab handle at top
+            sheet.prefersGrabberVisible = true
+            sheet.detents = [
+                .large()   // full screen
+            ]
+        }
         tabBarController?.present(helpVC, animated: true)
     }
 
     @objc private func didTapMenu() {
-        // Handle menu button tap
-        print("Menu button tapped")
-        // You can add your menu functionality here
+        let settingsVC = SettingsViewController()
+        navigationController?.pushViewController(settingsVC, animated: true)
     }
     
     @objc func didTapMembership() {
-        print("IAP button tapped")
-        // You can add your menu functionality here
+        showIAP()
     }
 }

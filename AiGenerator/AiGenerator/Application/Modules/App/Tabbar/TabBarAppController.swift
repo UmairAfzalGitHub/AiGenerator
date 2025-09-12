@@ -117,7 +117,7 @@ fileprivate enum AppTabBars: Int, CaseIterable {
         case .aging:
             return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 22, height: 22))
         case .generate:
-            return UIImage(systemName: "figure.2.and.child.holdinghands")!.scaled(to: CGSize(width: 22, height: 22))
+            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 22, height: 22))
         case .babygallery:
             return UIImage(systemName: "photo.stack")!.scaled(to: CGSize(width: 22, height: 22))
         }
@@ -128,7 +128,7 @@ fileprivate enum AppTabBars: Int, CaseIterable {
         case .aging:
             return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
         case .generate:
-            return UIImage(systemName: "figure.2.and.child.holdinghands")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
+            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
         case .babygallery:
             return UIImage(systemName: "photo.stack")!.scaled(to:CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
        }

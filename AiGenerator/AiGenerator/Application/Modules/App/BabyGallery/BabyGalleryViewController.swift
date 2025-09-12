@@ -9,9 +9,11 @@ import UIKit
 
 class BabyGalleryViewController: BaseViewController {
 
+    private let noDataContentView = UIView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Gallery"
+        title = "Baby Gallery"
+        setupNavigationBar()
     }
-
 }
