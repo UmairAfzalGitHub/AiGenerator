@@ -7,7 +7,7 @@
 
 import UIKit
 
-class HomeViewContoller: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     // MARK: - UI Elements
     private let scrollView = UIScrollView()
@@ -53,6 +53,7 @@ class HomeViewContoller: UIViewController, UIImagePickerControllerDelegate, UINa
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        title = "Generate"
         setupScrollHierarchy()
         setupParentsSection()
         setupGenderSection()
@@ -212,7 +213,7 @@ class HomeViewContoller: UIViewController, UIImagePickerControllerDelegate, UINa
         genderStack.addArrangedSubview(bottomRow)
         
         NSLayoutConstraint.activate([
-            genderTitle.topAnchor.constraint(equalTo: parentsGrid.bottomAnchor, constant: 20),
+            genderTitle.topAnchor.constraint(equalTo: parentsGrid.bottomAnchor, constant: 36),
             genderTitle.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             genderTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -259,7 +260,7 @@ class HomeViewContoller: UIViewController, UIImagePickerControllerDelegate, UINa
         }
         
         NSLayoutConstraint.activate([
-            ethnicityTitle.topAnchor.constraint(equalTo: genderStack.bottomAnchor, constant: 20),
+            ethnicityTitle.topAnchor.constraint(equalTo: genderStack.bottomAnchor, constant: 36),
             ethnicityTitle.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             ethnicityTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             

@@ -612,7 +612,7 @@ class IAPViewController: UIViewController {
                         message: "No active subscriptions found for this account. Please make sure you're signed in with the correct Apple ID."
                     )
                 }
-            }showAlert
+            }
         }
     }
     

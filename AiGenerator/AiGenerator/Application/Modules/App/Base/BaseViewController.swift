@@ -15,7 +15,7 @@ enum CellCorner {
     case all
 }
 
-class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate {
+class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate, IAPViewControllerDelegate {
 
     private var loaderVC: LoaderViewController?
     private var bannerAdId: AdMobId?
@@ -48,8 +48,8 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate 
         super.viewDidLoad()
         setup()
         style()
-        view.backgroundColor = .appPrimaryBackground
-        setupNavigationBarAppearance()
+        view.backgroundColor = .black
+        setupNavigationBar()
         setupStandardBackButton()
     }
     
@@ -69,56 +69,26 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate 
         print("✅✅ viewWillDisappear: \(String(describing: self))✅✅")
     }
     
-    deinit {
-        print("DE-INIT: \(self)")
-    }
+    deinit { print("DE-INIT: \(self)") }
     
-    func style() {
-        
-    }
+    func style() {}
+    
+    func setup() {}
     
     func setupBanner(adId: AdMobId) {
         bannerAdId = adId
     }
     
-    func setup() {
-//        view.addSubview(customNavigationBar)
-//        let navigationBarHeight: CGFloat = UIDevice().isSmallerDevice() ? 70 : 100
-//        NSLayoutConstraint.activate([
-//            customNavigationBar.topAnchor.constraint(equalTo: view.topAnchor),
-//            customNavigationBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            customNavigationBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            customNavigationBar.heightAnchor.constraint(equalToConstant: navigationBarHeight)
-//        ])
-    }
-    
     func showIAP() {
-        let iapVarientA = IAPOnboardingViewController()
-        iapVarientA.delegate = self
-        iapVC = iapVarientA
+        let iapView = IAPViewController()
+        iapView.delegate = self
+        iapVC = iapView
 
         iapVC?.modalPresentationStyle = .fullScreen
         iapVC?.modalTransitionStyle = .coverVertical
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
             self.present(self.iapVC ?? UIViewController(), animated: true, completion: nil)
         })
-    }
-    
-    func setupNavigationBarAppearance() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground() // Ensures no transparency issues
-        appearance.backgroundColor = UIColor.appSecondaryBackground // Change to your desired color
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.textPrimary] // Set title color
-        
-        // Configure back button appearance in the appearance object
-        appearance.setBackIndicatorImage(UIImage(systemName: "chevron.left"), transitionMaskImage: UIImage(systemName: "chevron.left"))
-        
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-        navigationController?.navigationBar.compactAppearance = appearance
-        
-        // Set tint color for all navigation bar items
-        navigationController?.navigationBar.tintColor = .black
     }
     
     func hideCustomNavigationBar() {
@@ -181,24 +151,6 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate 
         customNavigationBar.setLeftCustomView(imageView)
     }
     
-    func addRightPremiumView() {
-        let imageView = UIImageView(image: UIImage(named: "crown"))
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapMembership))
-        imageView.addGestureRecognizer(tapGesture)
-        customNavigationBar.setRightCustomView(imageView)
-    }
-    
-    func addRightSearchView() {
-        let imageView = UIImageView(image: UIImage(named: "search"))
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapSearch))
-        imageView.addGestureRecognizer(tapGesture)
-        customNavigationBar.setRightCustomView(imageView)
-    }
-    
     func addBackButton() {
         let imageView = UIImageView(image: UIImage(named: "back-arrow"))
         imageView.contentMode = .scaleAspectFit
@@ -249,52 +201,8 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate 
         }
     }
     
-    @objc func didTapMembership() {
-        
-    }
+
     
-    @objc func didTapSearch() {
-        
-    }
-
-    func openWebURL(_ urlString: String) {
-        guard let url = URL(string: urlString), UIApplication.shared.canOpenURL(url) else {
-            print("Invalid URL")
-            return
-        }
-
-        UIApplication.shared.open(url, options: [:]) { success in
-            if success {
-                print("URL successfully opened")
-            } else {
-                print("Failed to open URL")
-            }
-        }
-    }
-    
-    func createCustomStackViewForNavigationBar(image: UIImage?, tint: UIColor? = nil, action: Selector) -> UIStackView {
-        let imageView = UIImageView(image: image)
-        imageView.contentMode = .scaleAspectFit
-        imageView.isUserInteractionEnabled = true
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.widthAnchor.constraint(equalToConstant: 24).isActive = true
-        imageView.heightAnchor.constraint(equalToConstant: 24).isActive = true
-
-        if let tint {
-            imageView.tintColor = tint
-        }
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: action)
-        imageView.addGestureRecognizer(tapGesture)
-
-        let stackView = UIStackView(arrangedSubviews: [imageView])
-        stackView.axis = .horizontal
-        stackView.alignment = .center
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        
-        return stackView
-    }
-
     func showLoader(duration: TimeInterval = 1.0, completion: @escaping () -> Void) {
         let loader = LoaderViewController()
         loader.modalPresentationStyle = .overFullScreen
@@ -381,5 +289,109 @@ class BaseViewController: UIViewController, IAPOnboardingViewControllerDelegate 
     
     func cancelAction() {
         print("Cancel IAP Action")
+    }
+    
+    func setupNavigationBar() {
+        // Set navigation bar background color to match the design
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor.black // Dark background as shown in image
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        
+        // Remove the bottom border/shadow - THIS IS THE KEY PART YOU'RE MISSING
+        appearance.shadowColor = .clear
+        appearance.shadowImage = UIImage()
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
+        navigationController?.navigationBar.tintColor = .white
+        
+        // Additional border removal for older iOS versions
+        navigationController?.navigationBar.shadowImage = UIImage()
+        
+        // Hide the default back button
+        navigationItem.hidesBackButton = true
+        
+        // Create left side with help button
+        let helpButton = createRoundButton(
+            systemImage: "questionmark",
+            action: #selector(didTapHelp)
+        )
+        
+        // Create right side with crown and menu buttons
+        let crownButton = createRoundButton(
+            systemImage: "crown.fill",
+            action: #selector(didTapMembership)
+        )
+        
+        let menuButton = createRoundButton(
+            systemImage: "line.3.horizontal",
+            action: #selector(didTapMenu)
+        )
+        
+        // Set navigation bar items
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: helpButton)
+        navigationItem.rightBarButtonItems = [
+            UIBarButtonItem(customView: menuButton),
+            UIBarButtonItem(customView: crownButton)
+        ]
+    }
+
+    private func createRoundButton(systemImage: String, action: Selector) -> UIView {
+        // Create container view
+        let containerView = UIView()
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        containerView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        containerView.layer.cornerRadius = 22
+        containerView.layer.borderWidth = 1
+        containerView.layer.borderColor = UIColor.white.withAlphaComponent(0.2).cgColor
+        
+        // Create image view
+        let imageView = UIImageView()
+        imageView.image = UIImage(systemName: systemImage)
+        imageView.tintColor = .white
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add tap gesture
+        let tapGesture = UITapGestureRecognizer(target: self, action: action)
+        containerView.addGestureRecognizer(tapGesture)
+        containerView.isUserInteractionEnabled = true
+        
+        // Add image to container
+        containerView.addSubview(imageView)
+        
+        // Set constraints
+        NSLayoutConstraint.activate([
+            containerView.widthAnchor.constraint(equalToConstant: 44),
+            containerView.heightAnchor.constraint(equalToConstant: 44),
+            
+            imageView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 24),
+            imageView.heightAnchor.constraint(equalToConstant: 24)
+        ])
+        
+        return containerView
+    }
+
+    // MARK: - Navigation Button Actions
+    @objc private func didTapHelp() {
+        // Handle help button tap
+        print("Help button tapped")
+        let helpVC = HelpViewController()
+        tabBarController?.present(helpVC, animated: true)
+    }
+
+    @objc private func didTapMenu() {
+        // Handle menu button tap
+        print("Menu button tapped")
+        // You can add your menu functionality here
+    }
+    
+    @objc func didTapMembership() {
+        print("IAP button tapped")
+        // You can add your menu functionality here
     }
 }
