@@ -189,7 +189,7 @@ class IAPViewController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .clear  // Set to clear since we're using gradient
-        button.layer.cornerRadius = 8
+        button.layer.cornerRadius = 28
         button.clipsToBounds = true
         button.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         return button
@@ -346,7 +346,7 @@ class IAPViewController: UIViewController {
     }
     
     private func setupConstraints() {
-        let cellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .phone && UIDevice().isSmallDevice ? 54 : 64
+        let cellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .phone && UIDevice().isSmallDevice ? 54 : 56
         
         // Setup scrolling view constraint
         scrollingViewLeadingConstraint = scrollingView.leadingAnchor.constraint(equalTo: loopingImageContainer.leadingAnchor)
@@ -745,7 +745,7 @@ class PlanView: UIView {
     private lazy var containerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 12
+        view.layer.cornerRadius = 28
         view.layer.borderWidth = 1.5
         view.layer.borderColor = UIColor.textSecondary.cgColor
         view.backgroundColor = .clear
@@ -754,9 +754,18 @@ class PlanView: UIView {
     
     private lazy var selectionImage: UIImageView = {
         let image = UIImageView()
-        image.image = UIImage(named: "checkmark-unselected")
+        image.image = UIImage(systemName: "circle")
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
+    }()
+    
+    private lazy var titleStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, priceLabel])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 2
+        return stackView
     }()
     
     private lazy var titleLabel: UILabel = {
@@ -770,16 +779,52 @@ class PlanView: UIView {
     private lazy var priceLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.textColor = UIColor(white: 1, alpha: 0.5)
+        return label
+    }()
+    
+    private lazy var discountContainerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.cornerRadius = 12
+        view.backgroundColor = .systemRed
+        return view
+    }()
+    
+    private lazy var discountPriceLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "93% OFF"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.textColor = .white
+        return label
+    }()
+    
+    private lazy var modifiedPriceStack: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [modifiedPriceLabel, periodLabel])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.spacing = 2
+        return stackView
+    }()
+    
+    private lazy var modifiedPriceLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Rs999.99"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         label.textColor = .white
         return label
     }()
     
     private lazy var periodLabel: UILabel = {
         let label = UILabel()
+        label.text = "per week"
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        label.textColor = .textSecondary
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.textColor = UIColor(white: 1, alpha: 0.5)
         return label
     }()
     
@@ -796,9 +841,10 @@ class PlanView: UIView {
     private func setupUI() {
         addSubview(containerView)
         containerView.addSubview(selectionImage)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(priceLabel)
-        containerView.addSubview(periodLabel)
+        containerView.addSubview(titleStackView)
+        containerView.addSubview(modifiedPriceStack)
+        containerView.addSubview(discountContainerView)
+        discountContainerView.addSubview(discountPriceLabel)
         
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -806,21 +852,24 @@ class PlanView: UIView {
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            selectionImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 12),
+            selectionImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 10),
             selectionImage.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             selectionImage.widthAnchor.constraint(equalToConstant: 16),
             selectionImage.heightAnchor.constraint(equalToConstant: 16),
             
-            titleLabel.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 12),
-            titleLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            titleStackView.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 10),
+            titleStackView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             
-            periodLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -12),
-            periodLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            discountContainerView.leadingAnchor.constraint(equalTo: titleStackView.trailingAnchor, constant: 10),
+            discountContainerView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            discountContainerView.widthAnchor.constraint(equalToConstant: 74),
+            discountContainerView.heightAnchor.constraint(equalToConstant: 24),
             
-            priceLabel.trailingAnchor.constraint(equalTo: periodLabel.leadingAnchor, constant: -4),
-            priceLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: priceLabel.leadingAnchor, constant: -8)
+            discountPriceLabel.centerXAnchor.constraint(equalTo: discountContainerView.centerXAnchor),
+            discountPriceLabel.centerYAnchor.constraint(equalTo: discountContainerView.centerYAnchor),
+                        
+            modifiedPriceStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10),
+            modifiedPriceStack.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
         ])
     }
     
@@ -832,7 +881,7 @@ class PlanView: UIView {
     
     func setSelected(_ selected: Bool) {
         UIView.animate(withDuration: 0.3) {
-            var selectionImg = !selected ? UIImage(named: "checkmark-unselected") : UIImage(named: "checkmark-selected")
+            var selectionImg = !selected ? UIImage(systemName: "circle") : UIImage(systemName: "checkmark.circle")
             self.selectionImage.image = selectionImg
             self.containerView.layer.borderColor = selected ? UIColor.appPrimary.cgColor : UIColor.textSecondary.cgColor
             self.containerView.backgroundColor = selected ? UIColor.appPrimary.withAlphaComponent(0.1) : .clear
@@ -853,11 +902,11 @@ class GradientButton: UIButton {
         layer.sublayers?.removeAll { $0 is CAGradientLayer }
         
         let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [UIColor.systemCyan.cgColor, UIColor.systemTeal.cgColor]
+        gradientLayer.colors = [UIColor.appPrimaryBlue.cgColor, UIColor.appPrimary.cgColor]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.25)
         gradientLayer.endPoint = CGPoint(x: 0.88, y: 0.5)
         gradientLayer.frame = bounds
-        gradientLayer.cornerRadius = 8
+        gradientLayer.cornerRadius = 28
         
         layer.insertSublayer(gradientLayer, at: 0)
     }

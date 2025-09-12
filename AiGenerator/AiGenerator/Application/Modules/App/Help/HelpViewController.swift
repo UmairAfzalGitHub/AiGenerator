@@ -381,8 +381,8 @@ class HelpViewController: UIViewController {
         // Gradient background
         let gradientLayer = CAGradientLayer()
         gradientLayer.colors = [
-            UIColor(red: 0.3, green: 0.6, blue: 1.0, alpha: 1.0).cgColor,
-            UIColor(red: 0.8, green: 0.4, blue: 1.0, alpha: 1.0).cgColor
+            UIColor.appPrimaryBlue.cgColor,
+            UIColor.appPrimary.cgColor
         ]
         gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
         gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)

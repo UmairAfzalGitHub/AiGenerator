@@ -578,8 +578,8 @@ private class GradientActionButton: UIButton {
         layer.cornerRadius = 28
         clipsToBounds = true
         gradient.colors = [
-            UIColor(red: 94/255, green: 150/255, blue: 255/255, alpha: 1).cgColor,
-            UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 1).cgColor
+            UIColor.appPrimaryBlue.cgColor,
+            UIColor.appPrimary.cgColor
         ]
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)

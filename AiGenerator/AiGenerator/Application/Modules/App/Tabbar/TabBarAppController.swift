@@ -117,21 +117,21 @@ fileprivate enum AppTabBars: Int, CaseIterable {
         case .aging:
             return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 22, height: 22))
         case .generate:
-            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 22, height: 22))
+            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 22, height: 22)).withTintColor(.appPrimary)
         case .babygallery:
-            return UIImage(systemName: "photo.stack")!.scaled(to: CGSize(width: 22, height: 22))
+            return UIImage(systemName: "photo.stack")!.scaled(to: CGSize(width: 22, height: 22)).withTintColor(.appPrimary)
         }
     }
     
     var selectedImage: UIImage {
         switch self {
         case .aging:
-            return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
+            return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
         case .generate:
-            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
+            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
         case .babygallery:
-            return UIImage(systemName: "photo.stack")!.scaled(to:CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysTemplate)
-       }
+            return UIImage(systemName: "photo.stack")!.scaled(to:CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
+        }
     }
     
     var controller: UIViewController {
