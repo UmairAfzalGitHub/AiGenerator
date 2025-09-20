@@ -28,50 +28,14 @@ class IAPViewController: UIViewController {
     }
     
     // MARK: - Looping Image Properties
-    private lazy var loopingImageContainer: UIView = {
-        let view = UIView()
+    private lazy var gridView: GridView = {
+        let view = GridView(rows: 4, rowSpacing: 20)
         view.translatesAutoresizingMaskIntoConstraints = false
         view.isUserInteractionEnabled = false
         view.clipsToBounds = true
         return view
     }()
-    
-    private lazy var scrollingView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.isUserInteractionEnabled = false
-        return view
-    }()
-    
-    private lazy var firstImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "iap-looping-image")
-        imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.isUserInteractionEnabled = false
-        return imageView
-    }()
-    
-    private lazy var secondImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "iap-looping-image")
-        imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.isUserInteractionEnabled = false
-        return imageView
-    }()
-    
-    private lazy var thirdImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = UIImage(named: "iap-looping-image")
-        imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.isUserInteractionEnabled = false
-        return imageView
-    }()
-    
-    private var scrollingViewLeadingConstraint: NSLayoutConstraint!
-    
+
     // MARK: - UI Components
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -280,7 +244,6 @@ class IAPViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        setupLoopingImages()
         setupConstraints()
         setupFeatures()
         setupIAP()
@@ -289,12 +252,10 @@ class IAPViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        startLoopingAnimation()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        scrollingView.layer.removeAllAnimations()
     }
     
     // MARK: - Setup Methods
@@ -303,7 +264,7 @@ class IAPViewController: UIViewController {
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubview(loopingImageContainer)
+        contentView.addSubview(gridView)
         contentView.addSubview(backgroundImageView)
         
         // Add looping image container at the top
@@ -334,22 +295,9 @@ class IAPViewController: UIViewController {
         
         view.addSubview(loadingIndicator)
     }
-    
-    private func setupLoopingImages() {
-        loopingImageContainer.addSubview(scrollingView)
-        scrollingView.addSubview(firstImageView)
-        scrollingView.addSubview(secondImageView)
-        scrollingView.addSubview(thirdImageView)
-        
-        // Apply rotation to the container
-        loopingImageContainer.transform = CGAffineTransform(rotationAngle: -0.2)
-    }
-    
+
     private func setupConstraints() {
         let cellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .phone && UIDevice().isSmallDevice ? 54 : 56
-        
-        // Setup scrolling view constraint
-        scrollingViewLeadingConstraint = scrollingView.leadingAnchor.constraint(equalTo: loopingImageContainer.leadingAnchor)
         
         NSLayoutConstraint.activate([
             // ScrollView
@@ -372,37 +320,13 @@ class IAPViewController: UIViewController {
             backgroundImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             // Looping Image Container - at the top
-            loopingImageContainer.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -80),
-            loopingImageContainer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            loopingImageContainer.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 1.5),
-            loopingImageContainer.heightAnchor.constraint(equalTo: loopingImageContainer.widthAnchor, multiplier: 0.76),
-            
-            // Scrolling view constraints
-            scrollingViewLeadingConstraint,
-            scrollingView.topAnchor.constraint(equalTo: loopingImageContainer.topAnchor),
-            scrollingView.bottomAnchor.constraint(equalTo: loopingImageContainer.bottomAnchor),
-            scrollingView.widthAnchor.constraint(equalTo: loopingImageContainer.widthAnchor, multiplier: 3),
-            
-            // First image constraints
-            firstImageView.leadingAnchor.constraint(equalTo: scrollingView.leadingAnchor),
-            firstImageView.topAnchor.constraint(equalTo: scrollingView.topAnchor),
-            firstImageView.bottomAnchor.constraint(equalTo: scrollingView.bottomAnchor),
-            firstImageView.widthAnchor.constraint(equalTo: loopingImageContainer.widthAnchor),
-            
-            // Second image constraints (placed right after first image)
-            secondImageView.leadingAnchor.constraint(equalTo: firstImageView.trailingAnchor),
-            secondImageView.topAnchor.constraint(equalTo: scrollingView.topAnchor),
-            secondImageView.bottomAnchor.constraint(equalTo: scrollingView.bottomAnchor),
-            secondImageView.widthAnchor.constraint(equalTo: loopingImageContainer.widthAnchor),
-            
-            // Third image constraints (placed right after second image)
-            thirdImageView.leadingAnchor.constraint(equalTo: secondImageView.trailingAnchor),
-            thirdImageView.topAnchor.constraint(equalTo: scrollingView.topAnchor),
-            thirdImageView.bottomAnchor.constraint(equalTo: scrollingView.bottomAnchor),
-            thirdImageView.widthAnchor.constraint(equalTo: loopingImageContainer.widthAnchor),
+            gridView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -80),
+            gridView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            gridView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            gridView.heightAnchor.constraint(equalToConstant: self.view.frame.width),
             
             // Title Label
-            titleStackView.topAnchor.constraint(equalTo: loopingImageContainer.bottomAnchor, constant: -70),
+            titleStackView.topAnchor.constraint(equalTo: gridView.bottomAnchor, constant: 20.0),
             titleStackView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             
             titleContentView.heightAnchor.constraint(equalToConstant: 28),
@@ -461,34 +385,7 @@ class IAPViewController: UIViewController {
             loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
-    
-    // MARK: - Looping Animation Methods
-    private func startLoopingAnimation() {
-        // Reset position
-        scrollingViewLeadingConstraint.constant = 0
-        view.layoutIfNeeded()
-        
-        performLoopingStep()
-    }
-    
-    private func performLoopingStep() {
-        UIView.animate(withDuration: 10, delay: 0, options: [.curveLinear], animations: {
-            // Move one image width to the left
-            self.scrollingViewLeadingConstraint.constant -= self.loopingImageContainer.frame.width
-            self.view.layoutIfNeeded()
-        }) { _ in
-            // Check if we've moved past the second image
-            if self.scrollingViewLeadingConstraint.constant <= -self.loopingImageContainer.frame.width * 2 {
-                // Reset to show the first image (which looks identical to the third)
-                self.scrollingViewLeadingConstraint.constant = 0
-                self.view.layoutIfNeeded()
-            }
-            
-            // Continue the loop
-            self.performLoopingStep()
-        }
-    }
-    
+
     private func setupFeatures() {
         let features = [
             ("checkmark-iap", "Advanced Editing Tools"),
@@ -678,67 +575,6 @@ class IAPViewController: UIViewController {
     }
 }
 
-// MARK: - Alternative implementation with CABasicAnimation for smoother performance
-extension IAPViewController {
-    
-    private func startLoopingAnimationWithCAAnimation() {
-        // Stop any existing animations
-        scrollingView.layer.removeAllAnimations()
-        
-        // Reset position
-        scrollingView.transform = .identity
-        
-        // Create seamless looping animation
-        let animation = CABasicAnimation(keyPath: "transform.translation.x")
-        animation.fromValue = 0
-        animation.toValue = -loopingImageContainer.frame.width * 2
-        animation.duration = 3.0
-        animation.repeatCount = .infinity
-        animation.timingFunction = CAMediaTimingFunction(name: .linear)
-        
-        // This is key for smooth looping - it will seamlessly restart
-        animation.isRemovedOnCompletion = false
-        animation.fillMode = .forwards
-        
-        scrollingView.layer.add(animation, forKey: "looping")
-        
-        // Alternative approach using keyframe animation for even smoother results
-        startKeyframeLoopingAnimation()
-    }
-    
-    private func startKeyframeLoopingAnimation() {
-        scrollingView.layer.removeAllAnimations()
-        
-        let animation = CAKeyframeAnimation(keyPath: "transform.translation.x")
-        
-        // Define positions: start, after 1st image, after 2nd image, back to start
-        animation.values = [0, -loopingImageContainer.frame.width, -loopingImageContainer.frame.width * 2, 0]
-        animation.keyTimes = [0, 0.33, 0.66, 1.0]
-        animation.duration = 3.0
-        animation.repeatCount = .infinity
-        animation.timingFunction = CAMediaTimingFunction(name: .linear)
-        animation.calculationMode = .linear
-        
-        scrollingView.layer.add(animation, forKey: "smoothLooping")
-    }
-}
-
-// MARK: - Usage example with custom configuration
-extension IAPViewController {
-    
-    func configureLooping(duration: TimeInterval = 3.0, direction: ScrollDirection = .leftToRight) {
-        // You can call this method to customize the looping behavior
-        // Implementation would depend on your specific needs
-    }
-    
-    enum ScrollDirection {
-        case leftToRight
-        case rightToLeft
-        case topToBottom
-        case bottomToTop
-    }
-}
-
 // MARK: - PlanView Class
 class PlanView: UIView {
     
@@ -888,7 +724,6 @@ class PlanView: UIView {
         }
     }
 }
-
 
 class GradientButton: UIButton {
     override func layoutSubviews() {
