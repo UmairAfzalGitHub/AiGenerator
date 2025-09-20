@@ -16,10 +16,17 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
     private var collectionViews: [UICollectionView] = []
     private var displayLink: CADisplayLink?
     
+    // Image names data source
+    private var imageNames: [String] = []
+    
+    // Store randomized image names for each row
+    private var rowImageNames: [[String]] = []
+    
     init(rows: Int = 3, rowSpacing: CGFloat = 16) {
         self.rows = rows
         self.rowSpacing = rowSpacing
         super.init(frame: .zero)
+        generateImageNames()
         setupStackView()
         setupCollectionViews()
         startAutoScroll()
@@ -29,6 +36,7 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
         self.rows = 3
         self.rowSpacing = 16
         super.init(coder: coder)
+        generateImageNames()
         setupStackView()
         setupCollectionViews()
         startAutoScroll()
@@ -101,13 +109,28 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
     // MARK: - UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 50
+        // If we have randomized arrays, use their count, otherwise fall back to imageNames
+        if let rowIndex = collectionViews.firstIndex(of: collectionView), rowIndex < rowImageNames.count {
+            return rowImageNames[rowIndex].count
+        }
+        return imageNames.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "GridCell", for: indexPath) as! GridCell
-        cell.configure()
+        
+        // Get the appropriate image name based on which collection view this is
+        var imageName: String
+        if let rowIndex = collectionViews.firstIndex(of: collectionView), rowIndex < rowImageNames.count {
+            let rowImages = rowImageNames[rowIndex]
+            imageName = rowImages[indexPath.item % rowImages.count]
+        } else {
+            imageName = imageNames[indexPath.item % imageNames.count]
+        }
+        
+        cell.configure(imageName: imageName)
+        
         return cell
     }
     
@@ -120,5 +143,24 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
         let height = collectionView.bounds.height
         guard height > 0 else { return CGSize(width: 50, height: 50) }
         return CGSize(width: height, height: height) // square
+    }
+    
+    // MARK: - Image Names Generation
+    
+    private func generateImageNames() {
+        // Generate baby image names from baby-1 to baby-20
+        imageNames.removeAll()
+        rowImageNames.removeAll()
+        
+        for i in 1...20 {
+            imageNames.append("baby-\(i)")
+        }
+        
+        // Create randomized arrays for each row
+        for _ in 0..<rows {
+            var rowImages = imageNames
+            rowImages.shuffle() // Randomize the order
+            rowImageNames.append(rowImages)
+        }
     }
 }
