@@ -81,7 +81,7 @@ class TabBarAppController: UITabBarController, UITabBarControllerDelegate {
     }
     
     func localize() {
-        self.tabBar.items?[0].title = AppTabBars.aging.title()
+        self.tabBar.items?[0].title = AppTabBars.explore.title()
         self.tabBar.items?[1].title = AppTabBars.generate.title()
         self.tabBar.items?[2].title = AppTabBars.babygallery.title()
     }
@@ -97,14 +97,14 @@ class TabBarAppController: UITabBarController, UITabBarControllerDelegate {
 }
 
 fileprivate enum AppTabBars: Int, CaseIterable {
-    case aging
+    case explore
     case generate
     case babygallery
     
     func title() -> String {
         switch self {
-        case .aging:
-            "Aging"
+        case .explore:
+            "Explore"
         case .generate:
             "Generate"
         case .babygallery:
@@ -114,30 +114,30 @@ fileprivate enum AppTabBars: Int, CaseIterable {
     
     var image: UIImage {
         switch self {
-        case .aging:
-            return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 22, height: 22))
+        case .explore:
+            return UIImage(named: "explore-tabbar")!.scaled(to: CGSize(width: 22, height: 22))
         case .generate:
-            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 22, height: 22)).withTintColor(.appPrimary)
+            return UIImage(named: "generate-tabbar")!.scaled(to: CGSize(width: 22, height: 22)).withTintColor(.appPrimary)
         case .babygallery:
-            return UIImage(systemName: "photo.stack")!.scaled(to: CGSize(width: 22, height: 22)).withTintColor(.appPrimary)
+            return UIImage(named: "recents-tabbar")!.scaled(to: CGSize(width: 22, height: 22)).withTintColor(.appPrimary)
         }
     }
     
     var selectedImage: UIImage {
         switch self {
-        case .aging:
-            return UIImage(systemName: "hourglass")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
+        case .explore:
+            return UIImage(named: "explore-tabbar")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
         case .generate:
-            return UIImage(systemName: "figure.yoga")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
+            return UIImage(named: "generate-tabbar")!.scaled(to: CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
         case .babygallery:
-            return UIImage(systemName: "photo.stack")!.scaled(to:CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
+            return UIImage(named: "recents-tabbar")!.scaled(to:CGSize(width: 24, height: 24)) .withRenderingMode(.alwaysOriginal).withTintColor(.appPrimary)
         }
     }
     
     var controller: UIViewController {
         switch self {
-        case .aging:
-            return AgingViewController()
+        case .explore:
+            return ExploreViewController()
         case .generate:
             return HomeViewContoller()
         case .babygallery:

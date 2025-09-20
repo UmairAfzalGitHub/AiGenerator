@@ -113,10 +113,10 @@ class HelpViewController: UIViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
         let tips = [
-            "Look directly at the camera.",
+            "Avoid tilting or turning your head.",
+            "Remove any glasses or accessories that may block your face.",
+            "Face the camera straight on with a clear view of your eyes.",
             "Keep your photo centered and straight.",
-            "Avoid wearing glasses.",
-            "Make sure your face and eyes are clearly visible."
         ]
         
         tips.forEach { tipText in
