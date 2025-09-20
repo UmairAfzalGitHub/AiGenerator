@@ -91,16 +91,33 @@ class ExploreViewController: BaseViewController {
         return view
     }()
     
-    private lazy var superheroLabel: UILabel = {
+    private lazy var festivalsLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Superhero / Cartoon Style"
+        label.text = "Festivals"
         label.textColor = .white
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         return label
     }()
     
-    private lazy var superheroView: UIView = {
+    private lazy var festivalsView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = UIColor(white: 0.12, alpha: 1)
+        view.layer.cornerRadius = 15
+        return view
+    }()
+
+    private lazy var sportsLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Sports"
+        label.textColor = .white
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+        return label
+    }()
+    
+    private lazy var sportsView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = UIColor(white: 0.12, alpha: 1)
@@ -150,8 +167,10 @@ class ExploreViewController: BaseViewController {
         contentView.addSubview(fantasyThemesView)
         contentView.addSubview(schoolPhotosLabel)
         contentView.addSubview(schoolPhotosView)
-        contentView.addSubview(superheroLabel)
-        contentView.addSubview(superheroView)
+        contentView.addSubview(festivalsLabel)
+        contentView.addSubview(festivalsView)
+        contentView.addSubview(sportsLabel)
+        contentView.addSubview(sportsView)
         contentView.addSubview(professionalHeadshotLabel)
         contentView.addSubview(professionalHeadshotView)
         
@@ -206,16 +225,25 @@ class ExploreViewController: BaseViewController {
             schoolPhotosView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             schoolPhotosView.heightAnchor.constraint(equalToConstant: 150),
             
-            superheroLabel.topAnchor.constraint(equalTo: schoolPhotosView.bottomAnchor, constant: 32),
-            superheroLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            superheroLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
-            superheroView.topAnchor.constraint(equalTo: superheroLabel.bottomAnchor, constant: 16),
-            superheroView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            superheroView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            superheroView.heightAnchor.constraint(equalToConstant: 150),
-            
-            professionalHeadshotLabel.topAnchor.constraint(equalTo: superheroView.bottomAnchor, constant: 32),
+            festivalsLabel.topAnchor.constraint(equalTo: schoolPhotosView.bottomAnchor, constant: 32),
+            festivalsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            festivalsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+
+            festivalsView.topAnchor.constraint(equalTo: festivalsLabel.bottomAnchor, constant: 16),
+            festivalsView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            festivalsView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            festivalsView.heightAnchor.constraint(equalToConstant: 150),
+
+            sportsLabel.topAnchor.constraint(equalTo: festivalsView.bottomAnchor, constant: 32),
+            sportsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            sportsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+
+            sportsView.topAnchor.constraint(equalTo: sportsLabel.bottomAnchor, constant: 16),
+            sportsView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            sportsView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            sportsView.heightAnchor.constraint(equalToConstant: 150),
+
+            professionalHeadshotLabel.topAnchor.constraint(equalTo: sportsView.bottomAnchor, constant: 32),
             professionalHeadshotLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             professionalHeadshotLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -231,18 +259,18 @@ class ExploreViewController: BaseViewController {
 
     // MARK: - Category Rows with ScrollableStackView
     private func setupCategoryRows() {
-        // Superhero / Cartoon Style
-        let superheroItems = [
-            "Superman",
-            "Spider-Man",
-            "Hulk",
-            "Captain America",
-            "Iron Man",
-            "Batman",
-            "Wonder Woman",
-            "Thor"
+        // Festivals
+        let festivalItems = [
+            "Christmas",
+            "Eid",
+            "Diwali",
+            "Halloween",
+            "Easter",
+            "Birthday",
+            "New Year’s",
+            "Thanksgiving"
         ]
-        addScrollableRow(into: superheroView, items: superheroItems)
+        addScrollableRow(into: festivalsView, items: festivalItems)
 
         // Fantasy Themes
         let fantasyItems = [
@@ -267,6 +295,19 @@ class ExploreViewController: BaseViewController {
             "School \nPhoto Day"
         ]
         addScrollableRow(into: schoolPhotosView, items: schoolItems)
+
+        // Sports
+        let sportsItems = [
+            "Football/Soccer",
+            "Cricket",
+            "Basketball",
+            "Baseball",
+            "Tennis",
+            "Swimming",
+            "Martial Arts",
+            "Cycling"
+        ]
+        addScrollableRow(into: sportsView, items: sportsItems)
     }
 
     private func addScrollableRow(into container: UIView, items: [String]) {
@@ -290,8 +331,8 @@ class ExploreViewController: BaseViewController {
         cards.forEach { card in
             stackScroll.addArrangedSubview(card)
             NSLayoutConstraint.activate([
-                card.widthAnchor.constraint(equalToConstant: 120),
-                card.heightAnchor.constraint(equalToConstant: 120)
+                card.heightAnchor.constraint(equalTo: stackScroll.heightAnchor),
+                card.widthAnchor.constraint(equalTo: card.heightAnchor),
             ])
         }
     }
@@ -309,6 +350,13 @@ class ExploreViewController: BaseViewController {
         inner.backgroundColor = UIColor(white: 0.22, alpha: 1)
         card.addSubview(inner)
 
+        let labelView = UIView()
+        labelView.translatesAutoresizingMaskIntoConstraints = false
+        labelView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
+        labelView.layer.cornerRadius = 6
+        labelView.clipsToBounds = true
+        card.addSubview(labelView)
+
         // Bottom-right label
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -316,17 +364,26 @@ class ExploreViewController: BaseViewController {
         label.textColor = .white
         label.font = .systemFont(ofSize: 12, weight: .semibold)
         label.numberOfLines = 2
-        card.addSubview(label)
+        labelView.addSubview(label)
 
         NSLayoutConstraint.activate([
+            // inner fills the card
             inner.topAnchor.constraint(equalTo: card.topAnchor),
             inner.leadingAnchor.constraint(equalTo: card.leadingAnchor),
             inner.trailingAnchor.constraint(equalTo: card.trailingAnchor),
             inner.bottomAnchor.constraint(equalTo: card.bottomAnchor),
 
-            // Place label at bottom-right with a slight inset
-            label.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 4),
-            label.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8)
+            // position labelView at bottom-left, allow it to size to its content
+            labelView.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 8),
+            labelView.trailingAnchor.constraint(lessThanOrEqualTo: card.trailingAnchor, constant: -8),
+            labelView.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8),
+
+
+            // pin label inside labelView with padding so labelView's size is driven by the label
+            label.leadingAnchor.constraint(equalTo: labelView.leadingAnchor, constant: 6),
+            label.trailingAnchor.constraint(equalTo: labelView.trailingAnchor, constant: -6),
+            label.topAnchor.constraint(equalTo: labelView.topAnchor, constant: 4),
+            label.bottomAnchor.constraint(equalTo: labelView.bottomAnchor, constant: -4)
         ])
 
         return card
