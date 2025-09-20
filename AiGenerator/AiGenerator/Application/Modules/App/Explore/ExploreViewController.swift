@@ -216,7 +216,16 @@ class ExploreViewController: BaseViewController {
             fantasyThemesView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             fantasyThemesView.heightAnchor.constraint(equalToConstant: 150),
             
-            schoolPhotosLabel.topAnchor.constraint(equalTo: fantasyThemesView.bottomAnchor, constant: 32),
+            festivalsLabel.topAnchor.constraint(equalTo: fantasyThemesView.bottomAnchor, constant: 32),
+            festivalsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            festivalsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            festivalsView.topAnchor.constraint(equalTo: festivalsLabel.bottomAnchor, constant: 16),
+            festivalsView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            festivalsView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            festivalsView.heightAnchor.constraint(equalToConstant: 150),
+            
+            schoolPhotosLabel.topAnchor.constraint(equalTo: festivalsView.bottomAnchor, constant: 32),
             schoolPhotosLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             schoolPhotosLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -225,16 +234,7 @@ class ExploreViewController: BaseViewController {
             schoolPhotosView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             schoolPhotosView.heightAnchor.constraint(equalToConstant: 150),
             
-            festivalsLabel.topAnchor.constraint(equalTo: schoolPhotosView.bottomAnchor, constant: 32),
-            festivalsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            festivalsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-
-            festivalsView.topAnchor.constraint(equalTo: festivalsLabel.bottomAnchor, constant: 16),
-            festivalsView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            festivalsView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            festivalsView.heightAnchor.constraint(equalToConstant: 150),
-
-            sportsLabel.topAnchor.constraint(equalTo: festivalsView.bottomAnchor, constant: 32),
+            sportsLabel.topAnchor.constraint(equalTo: schoolPhotosView.bottomAnchor, constant: 32),
             sportsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             sportsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
 
