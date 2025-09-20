@@ -131,6 +131,7 @@ class ExploreViewController: BaseViewController {
         title = "Explore"
         setupNavigationBar()
         setupUI()
+        setupCategoryRows()
     }
     
     func setupUI() {
@@ -226,5 +227,108 @@ class ExploreViewController: BaseViewController {
             // Important: Bottom constraint to ensure proper scrolling
             professionalHeadshotView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -32)
         ])
+    }
+
+    // MARK: - Category Rows with ScrollableStackView
+    private func setupCategoryRows() {
+        // Superhero / Cartoon Style
+        let superheroItems = [
+            "Superman",
+            "Spider-Man",
+            "Hulk",
+            "Captain America",
+            "Iron Man",
+            "Batman",
+            "Wonder Woman",
+            "Thor"
+        ]
+        addScrollableRow(into: superheroView, items: superheroItems)
+
+        // Fantasy Themes
+        let fantasyItems = [
+            "Prince / Princess",
+            "Astronaut",
+            "Time Traveler",
+            "Fairy / Elf",
+            "Knight in Armor",
+            "Pirate",
+            "Wizard / Witch",
+            "Dragon Rider"
+        ]
+        addScrollableRow(into: fantasyThemesView, items: fantasyItems)
+
+        // School Photos
+        let schoolItems = [
+            "Kindergarten \nUniform",
+            "School \nUniform",
+            "High School \nStudent",
+            "Graduation \nGown & Cap",
+            "Classroom \nPose",
+            "School \nPhoto Day"
+        ]
+        addScrollableRow(into: schoolPhotosView, items: schoolItems)
+    }
+
+    private func addScrollableRow(into container: UIView, items: [String]) {
+        let stackScroll = ScrollableStackView()
+        stackScroll.axis = .horizontal
+        stackScroll.alignment = .fill
+        stackScroll.distribution = .fill
+        stackScroll.spacing = 12
+        stackScroll.disableIntrinsicContentSizeScrolling = true
+
+        container.addSubview(stackScroll)
+        NSLayoutConstraint.activate([
+            stackScroll.topAnchor.constraint(equalTo: container.topAnchor, constant: 12),
+            stackScroll.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            stackScroll.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+            stackScroll.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -12)
+        ])
+
+        // Build item cards
+        let cards: [UIView] = items.map { buildItemCard(title: $0) }
+        cards.forEach { card in
+            stackScroll.addArrangedSubview(card)
+            NSLayoutConstraint.activate([
+                card.widthAnchor.constraint(equalToConstant: 120),
+                card.heightAnchor.constraint(equalToConstant: 120)
+            ])
+        }
+    }
+
+    private func buildItemCard(title: String) -> UIView {
+        let card = UIView()
+        card.translatesAutoresizingMaskIntoConstraints = false
+        card.backgroundColor = UIColor(white: 0.18, alpha: 1)
+        card.layer.cornerRadius = 12
+        card.layer.masksToBounds = true
+
+        // Placeholder inner view (e.g., image area)
+        let inner = UIView()
+        inner.translatesAutoresizingMaskIntoConstraints = false
+        inner.backgroundColor = UIColor(white: 0.22, alpha: 1)
+        card.addSubview(inner)
+
+        // Bottom-right label
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = title
+        label.textColor = .white
+        label.font = .systemFont(ofSize: 12, weight: .semibold)
+        label.numberOfLines = 2
+        card.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            inner.topAnchor.constraint(equalTo: card.topAnchor),
+            inner.leadingAnchor.constraint(equalTo: card.leadingAnchor),
+            inner.trailingAnchor.constraint(equalTo: card.trailingAnchor),
+            inner.bottomAnchor.constraint(equalTo: card.bottomAnchor),
+
+            // Place label at bottom-right with a slight inset
+            label.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 4),
+            label.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8)
+        ])
+
+        return card
     }
 }
