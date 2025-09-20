@@ -323,7 +323,8 @@ class IAPViewController: UIViewController {
             gridView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: -80),
             gridView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             gridView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            gridView.heightAnchor.constraint(equalToConstant: self.view.frame.width),
+            gridView.widthAnchor.constraint(equalTo: contentView.widthAnchor),
+            gridView.heightAnchor.constraint(equalTo: gridView.widthAnchor),
             
             // Title Label
             titleStackView.topAnchor.constraint(equalTo: gridView.bottomAnchor, constant: 20.0),
