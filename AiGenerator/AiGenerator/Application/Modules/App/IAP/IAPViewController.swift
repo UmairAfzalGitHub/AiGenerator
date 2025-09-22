@@ -258,6 +258,23 @@ class IAPViewController: UIViewController {
         super.viewDidDisappear(animated)
     }
     
+    // MARK: - Gradient Border Management (Added from HomeViewController)
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Update gradient borders when layout changes
+        updateAllGradientBorders()
+    }
+    
+    private func updateAllGradientBorders() {
+        // Update plan view gradient borders based on selection state
+        if selectedPlan == .weekly {
+            weeklyPlanView.updateGradientBorder()
+        }
+        if selectedPlan == .monthly {
+            monthlyPlanView.updateGradientBorder()
+        }
+    }
+    
     // MARK: - Setup Methods
     private func setupUI() {
         view.backgroundColor = .black
@@ -665,6 +682,9 @@ class PlanView: UIView {
         return label
     }()
     
+    // Track selection state for gradient border management
+    private var isSelected: Bool = false
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -674,6 +694,14 @@ class PlanView: UIView {
         super.init(coder: coder)
         setupUI()
     }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Update gradient border when layout changes (similar to HomeViewController)
+        if isSelected {
+            containerView.updateGradientBorder()
+        }
+    }   
     
     private func setupUI() {
         addSubview(containerView)
@@ -717,11 +745,30 @@ class PlanView: UIView {
     }
     
     func setSelected(_ selected: Bool) {
+        isSelected = selected
+        
+        let gradientColors = [
+            UIColor.appPrimary.cgColor,
+            UIColor.appPrimaryBlue.cgColor
+        ]
         UIView.animate(withDuration: 0.3) {
-            var selectionImg = !selected ? UIImage(systemName: "circle") : UIImage(systemName: "checkmark.circle")
-            self.selectionImage.image = selectionImg
-            self.containerView.layer.borderColor = selected ? UIColor.appPrimary.cgColor : UIColor.textSecondary.cgColor
-            self.containerView.backgroundColor = selected ? UIColor.appPrimary.withAlphaComponent(0.1) : .clear
+            if selected {
+                let selectionImg = UIImage(systemName: "checkmark.circle")
+                self.selectionImage.image = selectionImg
+                self.containerView.addGradientBorder(
+                    colors: gradientColors,
+                    width: 2.0,
+                    cornerRadius: 28
+                )
+                self.containerView.backgroundColor = UIColor.appPrimary.withAlphaComponent(0.13)
+                self.containerView.layer.borderColor = UIColor.clear.cgColor
+            } else {
+                let selectionImg = UIImage(systemName: "circle")
+                self.selectionImage.image = selectionImg
+                self.containerView.removeGradientBorder()
+                self.containerView.backgroundColor = .clear
+                self.containerView.layer.borderColor = UIColor.darkGray.cgColor
+            }
         }
     }
 }
