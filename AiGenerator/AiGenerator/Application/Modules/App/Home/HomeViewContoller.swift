@@ -53,6 +53,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     
     private var selectedEthnicityIndex: Int? { didSet { updateEthnicitySelection() } }
     
+    // Track which parent photos are selected for gradient borders
+    private var hasFatherPhoto: Bool = false
+    private var hasMotherPhoto: Bool = false
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,6 +69,32 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         setupGenderSection()
         setupEthnicitySection()
         setupGenerateButton()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Update gradient borders when layout changes
+        updateAllGradientBorders()
+    }
+    
+    // MARK: - Gradient Border Management
+    private func updateAllGradientBorders() {
+        // Update parent cards gradient borders
+        if hasFatherPhoto {
+            fatherCard.updateGradientBorder()
+        }
+        if hasMotherPhoto {
+            motherCard.updateGradientBorder()
+        }
+        
+        // Update button gradient borders
+        randomButton.updateGradientBorder()
+        girlButton.updateGradientBorder()
+        boyButton.updateGradientBorder()
+        
+        for button in ethnicityButtons {
+            button.updateGradientBorder()
+        }
     }
     
     // MARK: - Setup
@@ -383,11 +413,36 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
         guard let img = info[.originalImage] as? UIImage else { return }
+        
+        // Define gradient colors
+        let gradientColors = [
+            UIColor.appPrimary.cgColor,
+            UIColor.appPrimaryBlue.cgColor
+        ]
+        
         switch activeSlot {
         case .father:
             fatherImageView.image = img
+            hasFatherPhoto = true
+            // Add gradient border to father card
+            DispatchQueue.main.async {
+                self.fatherCard.addGradientBorder(
+                    colors: gradientColors,
+                    width: 2.0,
+                    cornerRadius: 16
+                )
+            }
         case .mother:
             motherImageView.image = img
+            hasMotherPhoto = true
+            // Add gradient border to mother card
+            DispatchQueue.main.async {
+                self.motherCard.addGradientBorder(
+                    colors: gradientColors,
+                    width: 2.0,
+                    cornerRadius: 16
+                )
+            }
         case .none:
             break
         }
@@ -400,7 +455,7 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
 
 // MARK: - UI Helpers
 
-// Gender Button - with icon support
+// Modified Gender Button - with gradient border support
 private class GenderButton: UIControl {
     private let container = UIView()
     private let iconView = UIImageView()
@@ -425,6 +480,12 @@ private class GenderButton: UIControl {
         isPicked = isSelected
     }
     
+//    func updateGradientBorder() {
+//        if isPicked {
+//            container.updateGradientBorder()
+//        }
+//    }
+//    
     private func setup() {
         container.backgroundColor = UIColor(white: 0.12, alpha: 1)
         container.layer.cornerRadius = 16
@@ -441,7 +502,7 @@ private class GenderButton: UIControl {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(titleLabel)
         
-        checkmark.tintColor = UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 1)
+        checkmark.tintColor = .appPrimary
         checkmark.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(checkmark)
         
@@ -468,16 +529,32 @@ private class GenderButton: UIControl {
         refresh()
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Update gradient border when layout changes
+        if isPicked {
+            container.updateGradientBorder()
+        }
+    }
+    
     private func refresh() {
         if isPicked {
-            container.layer.borderWidth = 2
-            container.layer.borderColor = UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 1).cgColor
+            // Apply gradient border
+            let gradientColors = [
+                UIColor.appPrimaryBlue.cgColor,
+                UIColor.appPrimary.cgColor
+            ]
+            container.addGradientBorder(
+                colors: gradientColors,
+                width: 2,
+                cornerRadius: 16
+            )
             container.backgroundColor = UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 0.1)
-            container.layer.cornerRadius = 18
+            container.layer.cornerRadius = 16
             checkmark.isHidden = false
         } else {
-            container.layer.borderWidth = 0
-            container.layer.borderColor = UIColor.clear.cgColor
+            // Remove gradient border
+            container.removeGradientBorder()
             container.backgroundColor = UIColor(white: 0.12, alpha: 1)
             container.layer.cornerRadius = 16
             checkmark.isHidden = true
@@ -485,7 +562,7 @@ private class GenderButton: UIControl {
     }
 }
 
-// Ethnicity Button - without icon, text only
+// Modified Ethnicity Button - with gradient border support
 private class EthnicityButton: UIControl {
     private let container = UIView()
     private let titleLabel = UILabel()
@@ -507,6 +584,12 @@ private class EthnicityButton: UIControl {
         titleLabel.text = text
         isPicked = isSelected
     }
+    
+//    func updateGradientBorder() {
+//        if isPicked {
+//            container.updateGradientBorder()
+//        }
+//    }
     
     private func setup() {
         container.backgroundColor = UIColor(white: 0.12, alpha: 1)
@@ -544,16 +627,32 @@ private class EthnicityButton: UIControl {
         refresh()
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // Update gradient border when layout changes
+        if isPicked {
+            container.updateGradientBorder()
+        }
+    }
+    
     private func refresh() {
         if isPicked {
-            container.layer.borderWidth = 2
-            container.layer.borderColor = UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 1).cgColor
+            // Apply gradient border
+            let gradientColors = [
+                UIColor.appPrimaryBlue.cgColor,
+                UIColor.appPrimary.cgColor
+            ]
+            container.addGradientBorder(
+                colors: gradientColors,
+                width: 2,
+                cornerRadius: 16
+            )
             container.backgroundColor = UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 0.1)
-            container.layer.cornerRadius = 18
+            container.layer.cornerRadius = 16
             checkmark.isHidden = false
         } else {
-            container.layer.borderWidth = 0
-            container.layer.borderColor = UIColor.clear.cgColor
+            // Remove gradient border
+            container.removeGradientBorder()
             container.backgroundColor = UIColor(white: 0.12, alpha: 1)
             container.layer.cornerRadius = 16
             checkmark.isHidden = true
