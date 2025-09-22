@@ -325,6 +325,7 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         generateButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         generateButton.setTitleColor(.white, for: .normal)
         generateButton.translatesAutoresizingMaskIntoConstraints = false
+        generateButton.addTarget(self, action: #selector(generateButtonTapped), for: .touchUpInside)
         
         // Add the button directly to the main view (not contentView)
         view.addSubview(generateButton)
@@ -367,6 +368,80 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         selectedEthnicityIndex = sender.tag
     }
     
+    @objc private func generateButtonTapped() {
+        // Validate inputs
+        guard let fatherImage = fatherImageView.image else {
+            showAlert(title: "Missing Input", message: "Please add father's photo")
+            return
+        }
+        
+        guard let motherImage = motherImageView.image else {
+            showAlert(title: "Missing Input", message: "Please add mother's photo")
+            return
+        }
+        
+        guard let babyName = babyNameTextField.text, !babyName.isEmpty else {
+            showAlert(title: "Missing Input", message: "Please enter baby name")
+            return
+        }
+        
+        // Get selected gender
+        let gender: String
+        switch selectedGender {
+        case .random:
+            gender = "random"
+        case .girl:
+            gender = "female"
+        case .boy:
+            gender = "male"
+        }
+        
+        // Get selected ethnicity
+        let ethnicity: String
+        if let selectedIndex = selectedEthnicityIndex, selectedIndex < ethnicityButtons.count {
+            ethnicity = ethnicityButtons[selectedIndex].titleLabel.text ?? "Caucasian"
+        } else {
+            ethnicity = "Caucasian" // Default ethnicity
+        }
+        
+        // Show loading indicator
+        let loadingIndicator = UIActivityIndicatorView(style: .large)
+        loadingIndicator.center = view.center
+        loadingIndicator.color = .white
+        loadingIndicator.startAnimating()
+        view.addSubview(loadingIndicator)
+        
+        // Call the BabyImageManager
+        BabyImageManager.shared.generateBabyImage(
+            mother: motherImage,
+            father: fatherImage,
+            gender: gender,
+            ethnicity: ethnicity,
+            babyName: babyName,
+            age: 5
+        ) { [weak self] result in
+            guard let self = self else { return }
+            
+            // Remove loading indicator
+            DispatchQueue.main.async {
+                loadingIndicator.removeFromSuperview()
+            }
+            
+            switch result {
+            case .success(let babyImage):
+                DispatchQueue.main.async {
+                    // Navigate to results screen with the generated image
+                    self.showResultsScreen(with: babyImage, name: babyName)
+                }
+            case .failure(let error):
+                print("❌ Error: \(error)")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Generation Failed", message: "Failed to generate baby image. Please try again.")
+                }
+            }
+        }
+    }
+    
     private func updateGenderSelection() {
         randomButton.isPicked = (selectedGender == .random)
         girlButton.isPicked = (selectedGender == .girl)
@@ -395,6 +470,22 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func showResultsScreen(with image: UIImage, name: String) {
+        print(image)
+        // Navigate to results screen with the generated baby image
+//        let resultsVC = ResultsViewController()
+//        resultsVC.configure(with: image, name: name)
+//        navigationController?.pushViewController(resultsVC, animated: true)
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }
 
@@ -488,7 +579,7 @@ private class GenderButton: UIControl {
 // Ethnicity Button - without icon, text only
 private class EthnicityButton: UIControl {
     private let container = UIView()
-    private let titleLabel = UILabel()
+    let titleLabel = UILabel()
     private let checkmark = UIImageView(image: UIImage(systemName: "checkmark.circle.fill"))
     
     var isPicked: Bool = false { didSet { refresh() } }
