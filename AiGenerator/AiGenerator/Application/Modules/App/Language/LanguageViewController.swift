@@ -21,20 +21,21 @@ class LanguageViewController: BaseViewController {
     
     private var languages: [Language] = [
         Language(title: "English", flagImage: "english-flag", isSelected: false, languageCode: "en"),
-        Language(title: "Hindi", flagImage: "hindi-flag", isSelected: false, languageCode: "hi"),
-        Language(title: "Chinese", flagImage: "chinese-flag", isSelected: false, languageCode: "zh-Hans"),
-        Language(title: "Russian", flagImage: "russian-flag", isSelected: false, languageCode: "ru"),
+        Language(title: "Arabic", flagImage: "arabic-flag", isSelected: false, languageCode: "ar"),
         Language(title: "Spanish", flagImage: "spanish-flag", isSelected: false, languageCode: "es"),
+        Language(title: "Chinese", flagImage: "chinese-flag", isSelected: false, languageCode: "zh-Hans"),
         Language(title: "French", flagImage: "french-flag", isSelected: false, languageCode: "fr"),
         Language(title: "German", flagImage: "german-flag", isSelected: false, languageCode: "de"),
+        Language(title: "Russian", flagImage: "russian-flag", isSelected: false, languageCode: "ru"),
         Language(title: "Indonesian", flagImage: "indonesian-flag", isSelected: false, languageCode: "id"),
+        Language(title: "Hindi", flagImage: "hindi-flag", isSelected: false, languageCode: "hi"),
         Language(title: "Japanese", flagImage: "japanese-flag", isSelected: false, languageCode: "ja"),
         Language(title: "Korean", flagImage: "korean-flag", isSelected: false, languageCode: "ko"),
+        Language(title: "Italian", flagImage: "italian-flag", isSelected: false, languageCode: "it"),
+        Language(title: "Malaysian", flagImage: "malay-flag", isSelected: false, languageCode: "ms"),
+        Language(title: "Thai", flagImage: "thai-flag", isSelected: false, languageCode: "th"),
+        Language(title: "Turkish", flagImage: "turkish-flag", isSelected: false, languageCode: "tr"),
         Language(title: "Vietnamese", flagImage: "vietnamese-flag", isSelected: false, languageCode: "vi"),
-        Language(title: "Italian", flagImage: "italian-flag", isSelected: false, languageCode: "vi"),
-        Language(title: "Turkish", flagImage: "turkish-flag", isSelected: false, languageCode: "vi"),
-        Language(title: "Malaysian", flagImage: "malay-flag", isSelected: false, languageCode: "vi"),
-        Language(title: "Thai", flagImage: "thai-flag", isSelected: false, languageCode: "vi"),
     ]
     
     private var selectedIndex: IndexPath?
