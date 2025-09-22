@@ -152,7 +152,7 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
         imageNames.removeAll()
         rowImageNames.removeAll()
         
-        for i in 1...20 {
+        for i in 1...30 {
             imageNames.append("baby-\(i)")
         }
         
