@@ -18,7 +18,7 @@ class IAPViewController: UIViewController {
     
     // MARK: - Properties
     private var monthlyProduct: SKProduct?
-    private var yearlyProduct: SKProduct?
+    private var weeklyProduct: SKProduct?
     var delegate: IAPViewControllerDelegate?
     
     private var selectedPlan: PlanType = .monthly
@@ -107,30 +107,30 @@ class IAPViewController: UIViewController {
         return label
     }()
     
-//    private lazy var descriptionLabel: UILabel = {
-//        let label = UILabel()
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//        label.text = "Unlock all premium features and enjoy unlimited access"
-//        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-//        label.textColor = .secondaryLabel
-//        label.textAlignment = .center
-//        label.numberOfLines = 0
-//        return label
-//    }()
-//    
-    private lazy var featuresStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .vertical
-        stackView.spacing = 7
-        stackView.distribution = .fillEqually
-        return stackView
+    private lazy var descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Unlock all premium features and enjoy unlimited access"
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.textColor = .secondaryLabel
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
     }()
+    
+//    private lazy var featuresStackView: UIStackView = {
+//        let stackView = UIStackView()
+//        stackView.translatesAutoresizingMaskIntoConstraints = false
+//        stackView.axis = .vertical
+//        stackView.spacing = 7
+//        stackView.distribution = .fillEqually
+//        return stackView
+//    }()
     
     private lazy var weeklyPlanView: PlanView = {
         let view = PlanView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.configure(title: "Weekly Premium", price: "Loading...", period: "week")
+        view.configure(title: "Weekly Premium", price: "$3.99", weeklyPrice: nil, period: "week")
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(weeklyPlanTapped))
         view.addGestureRecognizer(tapGesture)
         return view
@@ -139,7 +139,7 @@ class IAPViewController: UIViewController {
     private lazy var monthlyPlanView: PlanView = {
         let view = PlanView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.configure(title: "Monthly Premium", price: "Loading...", period: "month")
+        view.configure(title: "Monthly Premium", price: "$9.99", weeklyPrice: "$2.45", period: "month", discount: "70% OFF")
         view.setSelected(true)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(monthlyPlanTapped))
         view.addGestureRecognizer(tapGesture)
@@ -245,7 +245,6 @@ class IAPViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
-        setupFeatures()
         setupIAP()
         localize()
     }
@@ -287,11 +286,10 @@ class IAPViewController: UIViewController {
         // Add looping image container at the top
         
         // Add other UI elements
-//        contentView.addSubview(descriptionLabel)
         contentView.addSubview(titleStackView)
-        contentView.addSubview(featuresStackView)
-        contentView.addSubview(weeklyPlanView)
+        contentView.addSubview(descriptionLabel)
         contentView.addSubview(monthlyPlanView)
+        contentView.addSubview(weeklyPlanView)
         contentView.addSubview(autoRenewLabel)
         contentView.addSubview(limitedAccessButton)
         contentView.addSubview(restoreButton)
@@ -314,7 +312,7 @@ class IAPViewController: UIViewController {
     }
 
     private func setupConstraints() {
-        let cellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .phone && UIDevice().isSmallDevice ? 54 : 56
+        let cellHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .phone && UIDevice().isSmallDevice ? 54 : 66
         
         NSLayoutConstraint.activate([
             // ScrollView
@@ -355,23 +353,24 @@ class IAPViewController: UIViewController {
             titleCenterLabel.bottomAnchor.constraint(equalTo: titleContentView.bottomAnchor, constant: -4),
             
             // Features Stack View
-            featuresStackView.topAnchor.constraint(equalTo: titleStackView.bottomAnchor, constant: 20),
-            featuresStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            
-            // Weekly Plan
-            weeklyPlanView.topAnchor.constraint(equalTo: featuresStackView.bottomAnchor, constant: 26),
-            weeklyPlanView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            weeklyPlanView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            weeklyPlanView.heightAnchor.constraint(equalToConstant: cellHeight),
+            descriptionLabel.topAnchor.constraint(equalTo: titleStackView.bottomAnchor, constant: 20),
+            descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
             // Monthly Plan
-            monthlyPlanView.topAnchor.constraint(equalTo: weeklyPlanView.bottomAnchor, constant: 8),
+            monthlyPlanView.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 26),
             monthlyPlanView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             monthlyPlanView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             monthlyPlanView.heightAnchor.constraint(equalToConstant: cellHeight),
             
+            // Weekly Plan
+            weeklyPlanView.topAnchor.constraint(equalTo: monthlyPlanView.bottomAnchor, constant: 12),
+            weeklyPlanView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            weeklyPlanView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            weeklyPlanView.heightAnchor.constraint(equalToConstant: cellHeight),
+            
             // Limited Access Button
-            limitedAccessButton.topAnchor.constraint(equalTo: monthlyPlanView.bottomAnchor, constant: 12),
+            limitedAccessButton.topAnchor.constraint(equalTo: weeklyPlanView.bottomAnchor, constant: 12),
             limitedAccessButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             limitedAccessButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             limitedAccessButton.heightAnchor.constraint(equalToConstant: 48),
@@ -404,20 +403,6 @@ class IAPViewController: UIViewController {
         ])
     }
 
-    private func setupFeatures() {
-        let features = [
-            ("checkmark-iap", "Advanced Editing Tools"),
-            ("checkmark-iap", "Editing and Mixing"),
-            ("checkmark-iap", "No Watermarked Exports"),
-            ("checkmark-iap", "Ad-Free Experience")
-        ]
-        
-        features.forEach { iconName, title in
-            let featureView = createFeatureView(iconName: iconName, title: title)
-            featuresStackView.addArrangedSubview(featureView)
-        }
-    }
-    
     private func createFeatureView(iconName: String, title: String) -> UIView {
         let containerView = UIView()
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -487,7 +472,7 @@ class IAPViewController: UIViewController {
     }
     
     @objc private func continueButtonTapped() {
-        guard let selectedProduct = selectedPlan == .monthly ? monthlyProduct : yearlyProduct else {
+        guard let selectedProduct = selectedPlan == .monthly ? monthlyProduct : weeklyProduct else {
             showAlert(title: "Error", message: "Unable to load subscription products. Please try again.")
             return
         }
@@ -553,19 +538,59 @@ class IAPViewController: UIViewController {
         let products = IAPManager.shared.getSubscriptions()
         
         monthlyProduct = products.first { $0.productIdentifier == SubscriptionID.monthly.rawValue }
-        yearlyProduct = products.first { $0.productIdentifier == SubscriptionID.yearly.rawValue }
+        weeklyProduct = products.first { $0.productIdentifier == SubscriptionID.weekly.rawValue }
         
+        // Update Monthly Plan
         if let monthlyProduct = monthlyProduct {
-            let price = IAPManager.shared.getFormattedPrice(for: monthlyProduct)
-            monthlyPlanView.configure(title: "Monthly Premium", price: price.formatted, period: "month")
+            let monthlyPriceInfo = IAPManager.shared.getFormattedPrice(for: monthlyProduct)
+            let weeklyEquivalent = calculateWeeklyPrice(from: monthlyProduct.price as Decimal)
+            
+            // Calculate discount if we have weekly product
+            var discount: String? = nil
+            if let weeklyProduct = weeklyProduct {
+                let weeklyPrice = weeklyProduct.price
+                let monthlyWeeklyPrice = (monthlyProduct.price as Decimal) / 4.33
+                let discountPercent = calculateDiscountPercentage(weeklyPrice: weeklyPrice as Decimal, monthlyWeeklyPrice: monthlyWeeklyPrice)
+                if discountPercent > 0 {
+                    discount = "\(discountPercent)% OFF"
+                }
+            }
+            
+            monthlyPlanView.configure(
+                title: "Monthly Premium",
+                price: monthlyPriceInfo.formatted,
+                weeklyPrice: weeklyEquivalent,
+                period: "month",
+                discount: discount
+            )
         }
         
-        if let yearlyProduct = yearlyProduct {
-            let price = IAPManager.shared.getFormattedPrice(for: yearlyProduct)
-            weeklyPlanView.configure(title: "Yearly Premium", price: price.formatted, period: "year")
+        // Update Weekly Plan
+        if let weeklyProduct = weeklyProduct {
+            let weeklyPriceInfo = IAPManager.shared.getFormattedPrice(for: weeklyProduct)
+            weeklyPlanView.configure(
+                title: "Weekly Premium",
+                price: weeklyPriceInfo.formatted,
+                weeklyPrice: nil,
+                period: "week"
+            )
         }
         
         loadingIndicator.stopAnimating()
+    }
+    
+    private func calculateWeeklyPrice(from monthlyPrice: Decimal) -> String {
+        let weeklyPrice = monthlyPrice / 4.33 // Average weeks in a month
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.locale = monthlyProduct?.priceLocale ?? Locale.current
+        return formatter.string(from: weeklyPrice as NSDecimalNumber) ?? "$0.00"
+    }
+
+    private func calculateDiscountPercentage(weeklyPrice: Decimal, monthlyWeeklyPrice: Decimal) -> Int {
+        guard weeklyPrice > 0 else { return 0 }
+        let savings = (weeklyPrice - monthlyWeeklyPrice) / weeklyPrice
+        return NSDecimalNumber(decimal: savings * 100).intValue
     }
     
     private func handleSuccessfulPurchase(message: String) {
@@ -602,7 +627,7 @@ class PlanView: UIView {
         view.layer.cornerRadius = 28
         view.layer.borderWidth = 1.5
         view.layer.borderColor = UIColor.textSecondary.cgColor
-        view.backgroundColor = .clear
+        view.backgroundColor = .red
         return view
     }()
     
@@ -613,19 +638,46 @@ class PlanView: UIView {
         return image
     }()
     
+    private lazy var weeklyPriceLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.textColor = .white
+        label.textAlignment = .right
+        return label
+    }()
+
+    private lazy var periodLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.textColor = UIColor(white: 1, alpha: 0.5)
+        label.textAlignment = .right
+        return label
+    }()
+    
+    private lazy var originalPriceLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.textColor = UIColor(white: 1, alpha: 0.5)
+        return label
+    }()
+
     private lazy var titleStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, priceLabel])
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, originalPriceLabel])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.alignment = .leading
         stackView.spacing = 2
         return stackView
     }()
+
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
         label.textColor = .white
         return label
     }()
@@ -642,24 +694,25 @@ class PlanView: UIView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 12
-        view.backgroundColor = .systemRed
+        view.backgroundColor = .blue
+//        view.isHidden = true
         return view
     }()
     
-    private lazy var discountPriceLabel: UILabel = {
+    private lazy var discountLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "93% OFF"
         label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
         label.textColor = .white
+        label.textAlignment = .center
         return label
     }()
     
-    private lazy var modifiedPriceStack: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [modifiedPriceLabel, periodLabel])
+    private lazy var priceStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [weeklyPriceLabel, periodLabel])
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
-        stackView.alignment = .leading
+        stackView.alignment = .trailing
         stackView.spacing = 2
         return stackView
     }()
@@ -672,16 +725,7 @@ class PlanView: UIView {
         label.textColor = .white
         return label
     }()
-    
-    private lazy var periodLabel: UILabel = {
-        let label = UILabel()
-        label.text = "per week"
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(white: 1, alpha: 0.5)
-        return label
-    }()
-    
+
     // Track selection state for gradient border management
     private var isSelected: Bool = false
     
@@ -707,9 +751,9 @@ class PlanView: UIView {
         addSubview(containerView)
         containerView.addSubview(selectionImage)
         containerView.addSubview(titleStackView)
-        containerView.addSubview(modifiedPriceStack)
+        containerView.addSubview(priceStackView)
         containerView.addSubview(discountContainerView)
-        discountContainerView.addSubview(discountPriceLabel)
+        discountContainerView.addSubview(discountLabel)
         
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -717,12 +761,12 @@ class PlanView: UIView {
             containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
             
-            selectionImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 10),
+            selectionImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
             selectionImage.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             selectionImage.widthAnchor.constraint(equalToConstant: 16),
             selectionImage.heightAnchor.constraint(equalToConstant: 16),
             
-            titleStackView.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 10),
+            titleStackView.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 16),
             titleStackView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             
             discountContainerView.leadingAnchor.constraint(equalTo: titleStackView.trailingAnchor, constant: 10),
@@ -730,18 +774,36 @@ class PlanView: UIView {
             discountContainerView.widthAnchor.constraint(equalToConstant: 74),
             discountContainerView.heightAnchor.constraint(equalToConstant: 24),
             
-            discountPriceLabel.centerXAnchor.constraint(equalTo: discountContainerView.centerXAnchor),
-            discountPriceLabel.centerYAnchor.constraint(equalTo: discountContainerView.centerYAnchor),
+            discountLabel.centerXAnchor.constraint(equalTo: discountContainerView.centerXAnchor),
+            discountLabel.centerYAnchor.constraint(equalTo: discountContainerView.centerYAnchor),
                         
-            modifiedPriceStack.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -10),
-            modifiedPriceStack.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            priceStackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -20),
+            priceStackView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
         ])
     }
     
-    func configure(title: String, price: String, period: String) {
+    func configure(title: String, price: String, weeklyPrice: String?, period: String, discount: String? = nil) {
         titleLabel.text = title
-        priceLabel.text = price
-        periodLabel.text = "/\(period)"
+        originalPriceLabel.text = price
+        periodLabel.text = "per \(period)"
+        
+        // Show weekly equivalent price for monthly plan
+        if let weeklyPrice = weeklyPrice {
+            weeklyPriceLabel.text = weeklyPrice
+            weeklyPriceLabel.isHidden = false
+            periodLabel.text = "per week"
+        } else {
+            weeklyPriceLabel.text = price
+            weeklyPriceLabel.isHidden = false
+        }
+        
+        // Show discount badge if available
+        if let discount = discount {
+            discountLabel.text = discount
+//            discountContainerView.isHidden = false
+        } else {
+//            discountContainerView.isHidden = true
+        }
     }
     
     func setSelected(_ selected: Bool) {

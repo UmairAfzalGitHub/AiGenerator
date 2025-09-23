@@ -9,8 +9,8 @@ import StoreKit
 
 // Subscription Product IDs
 enum SubscriptionID: String {
-    case weekly = "com.photo.recovery.weekly"
-    case monthly = "com.photo.recovery.monthly"
+    case weekly = "com.ai.baby.weekly"
+    case monthly = "com.ai.baby.monthly"
     case yearly = "com.photo.recovery.yearly"
     
     static var allIdentifiers: [String] {
@@ -151,7 +151,7 @@ class IAPManager: NSObject {
         
         let requestContents: [String: Any] = [
             "receipt-data": receiptString,
-            "password": "f55293fc159847dc8eccfa360865bd00", // Your shared secret here
+            "password": "47ca34d89d34461f96dfbe655195d938", // Your shared secret here
             "exclude-old-transactions": true
         ]
         
