@@ -163,12 +163,9 @@ class IAPViewController: UIViewController {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Continue with Limited Access", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        button.setTitleColor(.appPrimary.withAlphaComponent(0.8), for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        button.setTitleColor(.appPrimary.withAlphaComponent(0.7), for: .normal)
         button.backgroundColor = .clear
-        button.layer.cornerRadius = 8
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.appPrimary.withAlphaComponent(0.1).cgColor
         button.addTarget(self, action: #selector(limitedAccessButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -188,8 +185,8 @@ class IAPViewController: UIViewController {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("Restore Purchases", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
-        button.setTitleColor(.appPrimary, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        button.setTitleColor(.textSecondary, for: .normal)
         button.addTarget(self, action: #selector(restoreButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -535,48 +532,51 @@ class IAPViewController: UIViewController {
     }
     
     @objc private func handleProductsFetched() {
-        let products = IAPManager.shared.getSubscriptions()
-        
-        monthlyProduct = products.first { $0.productIdentifier == SubscriptionID.monthly.rawValue }
-        weeklyProduct = products.first { $0.productIdentifier == SubscriptionID.weekly.rawValue }
-        
-        // Update Monthly Plan
-        if let monthlyProduct = monthlyProduct {
-            let monthlyPriceInfo = IAPManager.shared.getFormattedPrice(for: monthlyProduct)
-            let weeklyEquivalent = calculateWeeklyPrice(from: monthlyProduct.price as Decimal)
-            
-            // Calculate discount if we have weekly product
-            var discount: String? = nil
-            if let weeklyProduct = weeklyProduct {
-                let weeklyPrice = weeklyProduct.price
-                let monthlyWeeklyPrice = (monthlyProduct.price as Decimal) / 4.33
-                let discountPercent = calculateDiscountPercentage(weeklyPrice: weeklyPrice as Decimal, monthlyWeeklyPrice: monthlyWeeklyPrice)
-                if discountPercent > 0 {
-                    discount = "\(discountPercent)% OFF"
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let products = IAPManager.shared.getSubscriptions()
+
+            self.monthlyProduct = products.first { $0.productIdentifier == SubscriptionID.monthly.rawValue }
+            self.weeklyProduct = products.first { $0.productIdentifier == SubscriptionID.weekly.rawValue }
+
+            // Update Monthly Plan
+            if let monthlyProduct = self.monthlyProduct {
+                let monthlyPriceInfo = IAPManager.shared.getFormattedPrice(for: monthlyProduct)
+                let weeklyEquivalent = self.calculateWeeklyPrice(from: monthlyProduct.price as Decimal)
+
+                // Calculate discount if we have weekly product
+                var discount: String? = nil
+                if let weeklyProduct = self.weeklyProduct {
+                    let weeklyPrice = weeklyProduct.price
+                    let monthlyWeeklyPrice = (monthlyProduct.price as Decimal) / 4.33
+                    let discountPercent = self.calculateDiscountPercentage(weeklyPrice: weeklyPrice as Decimal, monthlyWeeklyPrice: monthlyWeeklyPrice)
+                    if discountPercent > 0 {
+                        discount = "\(discountPercent)% OFF"
+                    }
                 }
+
+                self.monthlyPlanView.configure(
+                    title: "Monthly Premium",
+                    price: monthlyPriceInfo.formatted,
+                    weeklyPrice: weeklyEquivalent,
+                    period: "month",
+                    discount: discount
+                )
             }
-            
-            monthlyPlanView.configure(
-                title: "Monthly Premium",
-                price: monthlyPriceInfo.formatted,
-                weeklyPrice: weeklyEquivalent,
-                period: "month",
-                discount: discount
-            )
+
+            // Update Weekly Plan
+            if let weeklyProduct = self.weeklyProduct {
+                let weeklyPriceInfo = IAPManager.shared.getFormattedPrice(for: weeklyProduct)
+                self.weeklyPlanView.configure(
+                    title: "Weekly Premium",
+                    price: weeklyPriceInfo.formatted,
+                    weeklyPrice: nil,
+                    period: "week"
+                )
+            }
+
+            self.loadingIndicator.stopAnimating()
         }
-        
-        // Update Weekly Plan
-        if let weeklyProduct = weeklyProduct {
-            let weeklyPriceInfo = IAPManager.shared.getFormattedPrice(for: weeklyProduct)
-            weeklyPlanView.configure(
-                title: "Weekly Premium",
-                price: weeklyPriceInfo.formatted,
-                weeklyPrice: nil,
-                period: "week"
-            )
-        }
-        
-        loadingIndicator.stopAnimating()
     }
     
     private func calculateWeeklyPrice(from monthlyPrice: Decimal) -> String {
@@ -624,16 +624,17 @@ class PlanView: UIView {
     private lazy var containerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.layer.cornerRadius = 28
+        view.layer.cornerRadius = 33
         view.layer.borderWidth = 1.5
         view.layer.borderColor = UIColor.textSecondary.cgColor
-        view.backgroundColor = .red
+        view.backgroundColor = .clear
         return view
     }()
     
     private lazy var selectionImage: UIImageView = {
         let image = UIImageView()
         image.image = UIImage(systemName: "circle")
+        image.tintColor = .textSecondary
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
@@ -647,20 +648,19 @@ class PlanView: UIView {
         return label
     }()
 
-    private lazy var periodLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(white: 1, alpha: 0.5)
-        label.textAlignment = .right
+        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        label.textColor = .white
         return label
     }()
     
     private lazy var originalPriceLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(white: 1, alpha: 0.5)
+        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        label.textColor = UIColor(white: 1, alpha: 0.7)
         return label
     }()
 
@@ -672,30 +672,21 @@ class PlanView: UIView {
         stackView.spacing = 2
         return stackView
     }()
-
     
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        label.textColor = .white
-        return label
-    }()
-    
-    private lazy var priceLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = UIColor(white: 1, alpha: 0.5)
-        return label
-    }()
+//    private lazy var priceLabel: UILabel = {
+//        let label = UILabel()
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+//        label.textColor = UIColor(white: 1, alpha: 0.7)
+//        return label
+//    }()
     
     private lazy var discountContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.layer.cornerRadius = 12
-        view.backgroundColor = .blue
-//        view.isHidden = true
+        view.backgroundColor = .systemRed
+        view.isHidden = true  // Start hidden
         return view
     }()
     
@@ -725,6 +716,16 @@ class PlanView: UIView {
         label.textColor = .white
         return label
     }()
+    
+    private lazy var periodLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        label.textColor = UIColor(white: 1, alpha: 0.7)
+        label.textAlignment = .right
+        return label
+    }()
+    
 
     // Track selection state for gradient border management
     private var isSelected: Bool = false
@@ -745,7 +746,7 @@ class PlanView: UIView {
         if isSelected {
             containerView.updateGradientBorder()
         }
-    }   
+    }
     
     private func setupUI() {
         addSubview(containerView)
@@ -754,6 +755,16 @@ class PlanView: UIView {
         containerView.addSubview(priceStackView)
         containerView.addSubview(discountContainerView)
         discountContainerView.addSubview(discountLabel)
+        // Ensure the discount badge keeps its intrinsic width and does not get compressed
+        discountContainerView.setContentHuggingPriority(.required, for: .horizontal)
+        discountContainerView.setContentCompressionResistancePriority(.required, for: .horizontal)
+        // Allow the title area to compress before the discount badge disappears
+        titleStackView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        // Debug aids: make it identifiable and visible in hierarchy
+        discountContainerView.accessibilityIdentifier = "discountContainerView"
+        discountContainerView.layer.borderWidth = 1 // REMOVE after verifying
+        discountContainerView.layer.borderColor = UIColor.yellow.withAlphaComponent(0.8).cgColor // REMOVE after verifying
+        containerView.bringSubviewToFront(discountContainerView)
         
         NSLayoutConstraint.activate([
             containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -763,16 +774,25 @@ class PlanView: UIView {
             
             selectionImage.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 20),
             selectionImage.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            selectionImage.widthAnchor.constraint(equalToConstant: 16),
-            selectionImage.heightAnchor.constraint(equalToConstant: 16),
+            selectionImage.widthAnchor.constraint(equalToConstant: 24),
+            selectionImage.heightAnchor.constraint(equalToConstant: 24),
             
-            titleStackView.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 16),
+            titleStackView.leadingAnchor.constraint(equalTo: selectionImage.trailingAnchor, constant: 12
+                                                   ),
             titleStackView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             
-            discountContainerView.leadingAnchor.constraint(equalTo: titleStackView.trailingAnchor, constant: 10),
+            // Give title stack a lower priority so it can compress when needed
+            titleStackView.trailingAnchor.constraint(lessThanOrEqualTo: discountContainerView.leadingAnchor, constant: -10).withPriority(.defaultHigh),
+            
             discountContainerView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             discountContainerView.widthAnchor.constraint(equalToConstant: 74),
             discountContainerView.heightAnchor.constraint(equalToConstant: 24),
+            
+            // Give a clear leading and trailing relation to avoid Auto Layout ambiguity
+            discountContainerView.leadingAnchor.constraint(greaterThanOrEqualTo: titleStackView.trailingAnchor, constant: 10),
+            discountContainerView.trailingAnchor.constraint(equalTo: priceStackView.leadingAnchor, constant: -10),
+            // Fallback: keep it within the container horizontally if layout becomes ambiguous
+            discountContainerView.centerXAnchor.constraint(equalTo: containerView.centerXAnchor).withPriority(.defaultLow),
             
             discountLabel.centerXAnchor.constraint(equalTo: discountContainerView.centerXAnchor),
             discountLabel.centerYAnchor.constraint(equalTo: discountContainerView.centerYAnchor),
@@ -798,12 +818,19 @@ class PlanView: UIView {
         }
         
         // Show discount badge if available
-        if let discount = discount {
+        if let discount = discount, !discount.isEmpty {
             discountLabel.text = discount
-//            discountContainerView.isHidden = false
+            discountContainerView.isHidden = false
+            discountContainerView.alpha = 1
+            print("Showing discount: \(discount)") // Debug print
         } else {
-//            discountContainerView.isHidden = true
+            discountContainerView.isHidden = true
+            discountContainerView.alpha = 0
+            print("Hiding discount") // Debug print
         }
+        // Force layout update so changes reflect immediately in UI and Debug Hierarchy
+        setNeedsLayout()
+        layoutIfNeeded()
     }
     
     func setSelected(_ selected: Bool) {
@@ -815,8 +842,9 @@ class PlanView: UIView {
         ]
         UIView.animate(withDuration: 0.3) {
             if selected {
-                let selectionImg = UIImage(systemName: "checkmark.circle")
+                let selectionImg = UIImage(systemName: "record.circle")
                 self.selectionImage.image = selectionImg
+                self.selectionImage.tintColor = .appPrimary
                 self.containerView.addGradientBorder(
                     colors: gradientColors,
                     width: 2.0,
@@ -827,11 +855,20 @@ class PlanView: UIView {
             } else {
                 let selectionImg = UIImage(systemName: "circle")
                 self.selectionImage.image = selectionImg
+                self.selectionImage.tintColor = .textSecondary
                 self.containerView.removeGradientBorder()
                 self.containerView.backgroundColor = .clear
                 self.containerView.layer.borderColor = UIColor.darkGray.cgColor
             }
         }
+    }
+}
+
+// Helper extension for constraint priorities
+extension NSLayoutConstraint {
+    func withPriority(_ priority: UILayoutPriority) -> NSLayoutConstraint {
+        self.priority = priority
+        return self
     }
 }
 
