@@ -22,7 +22,7 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
     // Store randomized image names for each row
     private var rowImageNames: [[String]] = []
     
-    init(rows: Int = 3, rowSpacing: CGFloat = 16) {
+    init(rows: Int = 2, rowSpacing: CGFloat = 4) { // Fewer rows, tighter spacing
         self.rows = rows
         self.rowSpacing = rowSpacing
         super.init(frame: .zero)
@@ -33,8 +33,8 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
     }
     
     required init?(coder: NSCoder) {
-        self.rows = 3
-        self.rowSpacing = 16
+        self.rows = 2
+        self.rowSpacing = 4 // Fewer rows, tighter spacing
         super.init(coder: coder)
         generateImageNames()
         setupStackView()
@@ -60,7 +60,7 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
         for _ in 0..<rows {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = .horizontal
-            layout.minimumLineSpacing = 20
+            layout.minimumLineSpacing = 4 // Reduced spacing between images
             layout.minimumInteritemSpacing = 0
             
             let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -141,8 +141,11 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let height = collectionView.bounds.height
-        guard height > 0 else { return CGSize(width: 50, height: 50) }
-        return CGSize(width: height, height: height) // square
+        guard height > 0 else { return CGSize(width: 120, height: 120) } // Larger fallback size
+        
+        // Keep images complete by using the full row height (no multiplier > 1)
+        // Images will be larger because we have fewer rows now
+        return CGSize(width: height, height: height) // Perfect square, no clipping
     }
     
     // MARK: - Image Names Generation
@@ -152,7 +155,7 @@ class GridView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlow
         imageNames.removeAll()
         rowImageNames.removeAll()
         
-        for i in 1...20 {
+        for i in 1...30 {
             imageNames.append("baby-\(i)")
         }
         

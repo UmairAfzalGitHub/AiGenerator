@@ -36,8 +36,29 @@ class ExploreViewController: BaseViewController {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = UIColor(white: 0.12, alpha: 1)
+        view.clipsToBounds = true
         view.layer.cornerRadius = 15
         return view
+    }()
+    
+    private lazy var babyGeneratorImage: UIImageView = {
+        let image = UIImageView()
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.image = UIImage(named: "ai-baby-generator")
+        image.contentMode = .scaleAspectFill
+        image.clipsToBounds = true
+        return image
+    }()
+    
+    private lazy var babyGeneratorInternalLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "See what your future\nbaby looks like"
+        label.textColor = .black
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 22, weight: .bold)
+        return label
     }()
     
     private lazy var ageLabel: UILabel = {
@@ -161,6 +182,8 @@ class ExploreViewController: BaseViewController {
         // Add all content to content view
         contentView.addSubview(babyGeneratorLabel)
         contentView.addSubview(babyGeneratorView)
+        babyGeneratorView.addSubview(babyGeneratorImage)
+        babyGeneratorView.addSubview(babyGeneratorInternalLabel)
         contentView.addSubview(ageLabel)
         contentView.addSubview(agingGeneratorView)
         contentView.addSubview(fantasyThemesLabel)
@@ -197,6 +220,14 @@ class ExploreViewController: BaseViewController {
             babyGeneratorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             babyGeneratorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             babyGeneratorView.heightAnchor.constraint(equalToConstant: 150),
+            
+            babyGeneratorImage.topAnchor.constraint(equalTo: babyGeneratorView.topAnchor),
+            babyGeneratorImage.leadingAnchor.constraint(equalTo: babyGeneratorView.leadingAnchor),
+            babyGeneratorImage.trailingAnchor.constraint(equalTo: babyGeneratorView.trailingAnchor),
+            babyGeneratorImage.bottomAnchor.constraint(equalTo: babyGeneratorView.bottomAnchor),
+            
+            babyGeneratorInternalLabel.centerYAnchor.constraint(equalTo: babyGeneratorView.centerYAnchor),
+            babyGeneratorInternalLabel.leadingAnchor.constraint(equalTo: babyGeneratorView.leadingAnchor, constant: 10),
             
             ageLabel.topAnchor.constraint(equalTo: babyGeneratorView.bottomAnchor, constant: 32),
             ageLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),

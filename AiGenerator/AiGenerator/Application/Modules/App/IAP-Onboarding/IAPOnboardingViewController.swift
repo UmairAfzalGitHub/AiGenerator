@@ -184,7 +184,7 @@ class IAPOnboardingViewController: UIViewController {
     private lazy var weeklyPlanView: PlanView = {
         let view = PlanView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.configure(title: "Weekly Premium", price: "Loading...", period: "week")
+        view.configure(title: "Weekly Premium", price: "$3.99", weeklyPrice: nil, period: "week")
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(weeklyPlanTapped))
         view.addGestureRecognizer(tapGesture)
         return view
@@ -193,7 +193,7 @@ class IAPOnboardingViewController: UIViewController {
     private lazy var monthlyPlanView: PlanView = {
         let view = PlanView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.configure(title: "Monthly Premium", price: "Loading...", period: "month")
+        view.configure(title: "Monthly Premium", price: "$9.99", weeklyPrice: "$2.45", period: "month", discount: "70% OFF")
         view.setSelected(true)
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(monthlyPlanTapped))
         view.addGestureRecognizer(tapGesture)
@@ -709,16 +709,16 @@ class IAPOnboardingViewController: UIViewController {
         monthlyProduct = products.first { $0.productIdentifier == SubscriptionID.monthly.rawValue }
         yearlyProduct = products.first { $0.productIdentifier == SubscriptionID.yearly.rawValue }
         
-        if let monthlyProduct = monthlyProduct {
-            let price = IAPManager.shared.getFormattedPrice(for: monthlyProduct)
-            monthlyPlanView.configure(title: "Monthly Premium", price: price.formatted, period: "month")
-        }
-        
-        if let yearlyProduct = yearlyProduct {
-            let price = IAPManager.shared.getFormattedPrice(for: yearlyProduct)
-            weeklyPlanView.configure(title: "Yearly Premium", price: price.formatted, period: "year")
-        }
-        
+//        if let monthlyProduct = monthlyProduct {
+//            let price = IAPManager.shared.getFormattedPrice(for: monthlyProduct)
+//            monthlyPlanView.configure(title: "Monthly Premium", price: price.formatted, period: "month")
+//        }
+//        
+//        if let yearlyProduct = yearlyProduct {
+//            let price = IAPManager.shared.getFormattedPrice(for: yearlyProduct)
+//            weeklyPlanView.configure(title: "Yearly Premium", price: price.formatted, period: "year")
+//        }
+//        
         loadingIndicator.stopAnimating()
     }
     
