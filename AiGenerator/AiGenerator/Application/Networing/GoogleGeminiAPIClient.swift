@@ -21,16 +21,8 @@ final class GoogleGeminiAPIClient {
     private let apiKey: String = ""
 
     // MARK: - Endpoint
-    // Using the correct endpoint for image generation as per Google documentation
-    private let baseURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent"
-    
-    // Model parameter for image generation
-    private let generationConfig: [String: Any] = [
-        "temperature": 0.9,
-        "topP": 1,
-        "topK": 32,
-        "maxOutputTokens": 2048
-    ]
+    // Using the correct endpoint for image generation with Imagen API
+    private let baseURL = "https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict"
     
     // MARK: - Public Method
     // MARK: - Helper Methods
@@ -212,7 +204,14 @@ final class GoogleGeminiAPIClient {
     
     func generateImage(prompt: String, images: [UIImage], completion: @escaping (Result<Data, Error>) -> Void) {
         logger.info("🚀 Starting image generation with prompt: \(prompt.prefix(50))...")
-        logger.info("📸 Processing \(images.count) parent images")
+        
+        // Note: Imagen API doesn't accept input images, so we'll modify the prompt to include parent descriptions
+        var enhancedPrompt = prompt
+        if !images.isEmpty {
+            enhancedPrompt += " The baby should be a blend of the parents' features."
+        }
+        
+        logger.info("✍️ Enhanced prompt: \(enhancedPrompt.prefix(100))...")
         
         guard let url = URL(string: "\(baseURL)?key=\(apiKey)") else {
             let error = NSError(domain: "Invalid URL", code: -1)
@@ -221,43 +220,15 @@ final class GoogleGeminiAPIClient {
             return
         }
         
-        // Convert images to Base64 with aggressive compression and resizing
-        logger.info("🔄 Converting images to Base64 with compression")
-        let inlineDataArray: [[String: Any]] = images.compactMap { image in
-            // Resize image to reduce size
-            let maxDimension: CGFloat = 800.0
-            let resizedImage = resizeImage(image, targetSize: maxDimension)
-            
-            // Use much more aggressive compression (0.3 instead of 0.8)
-            guard let imageData = resizedImage.jpegData(compressionQuality: 0.3) else { 
-                logger.error("❌ Failed to convert image to JPEG data")
-                return nil 
-            }
-            let base64Size = imageData.base64EncodedString().count
-            logger.info("📊 Image converted to Base64 (size: \(base64Size / 1024) KB)")
-            return [
-                "inline_data": [
-                    "mime_type": "image/jpeg",
-                    "data": imageData.base64EncodedString()
-                ]
-            ]
-        }
-        
-        // Build request body with generation parameters for image output
+        // Build request body for Imagen API
         let requestBody: [String: Any] = [
-            "contents": [
+            "instances": [
                 [
-                    "parts": [
-                        ["text": prompt]
-                    ] + inlineDataArray
+                    "prompt": enhancedPrompt
                 ]
             ],
-            "generationConfig": [
-                "temperature": 0.9,
-                "topP": 1,
-                "topK": 32,
-                "maxOutputTokens": 2048,
-                "responseMimeType": "image/png"
+            "parameters": [
+                "sampleCount": 1 // Generate one image
             ]
         ]
         
@@ -278,7 +249,7 @@ final class GoogleGeminiAPIClient {
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         
         // Execute request
-        logger.info("📡 Sending request to Gemini API")
+        logger.info("📡 Sending request to Imagen API")
         let startTime = Date()
         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
@@ -318,50 +289,36 @@ final class GoogleGeminiAPIClient {
                     self.logger.info("💬 Response content: \(jsonString.prefix(500))...")
                 }
                 
-                if let candidates = json?["candidates"] as? [[String: Any]],
-                   let firstCandidate = candidates.first,
-                   let content = firstCandidate["content"] as? [String: Any],
-                   let parts = content["parts"] as? [[String: Any]] {
-                    
-                    // Try to extract image data first - using the correct field names from documentation
-                    if let part = parts.first,
-                       let base64Image = part["inline_data"] as? [String: Any],
-                       let imageDataString = base64Image["data"] as? String,
+                // Parse Imagen API response format
+                if let predictions = json?["predictions"] as? [[String: Any]], !predictions.isEmpty {
+                    // Imagen API returns base64 encoded images in the 'bytesBase64Encoded' field
+                    if let firstPrediction = predictions.first,
+                       let imageDataString = firstPrediction["bytesBase64Encoded"] as? String,
                        let imageData = Data(base64Encoded: imageDataString) {
                         
-                        self.logger.info("✅ Successfully parsed image data: \(imageData.count / 1024) KB")
+                        self.logger.info("✅ Successfully parsed image data from Imagen API: \(imageData.count / 1024) KB")
                         completion(.success(imageData))
                         return
                     }
+                }
+                
+                // If we couldn't find the expected image data, check for error information
+                if let error = json?["error"] as? [String: Any],
+                   let message = error["message"] as? String {
+                    self.logger.error("❌ API error message: \(message)")
                     
-                    // Alternative format - try the old format as well for backward compatibility
-                    if let part = parts.first,
-                       let base64Image = part["inlineData"] as? [String: Any],
-                       let imageDataString = base64Image["data"] as? String,
-                       let imageData = Data(base64Encoded: imageDataString) {
-                        
-                        self.logger.info("✅ Successfully parsed image data (legacy format): \(imageData.count / 1024) KB")
-                        completion(.success(imageData))
-                        return
-                    }
-                    
-                    // If no image data, try to use text response to generate an image
-                    if let part = parts.first, let text = part["text"] as? String {
-                        self.logger.info("💬 Received text response instead of image: \(text.prefix(100))...")
-                        
-                        // Try to generate an image from the text description using a fallback method
-                        self.generateFallbackImage(from: text) { result in
-                            switch result {
-                            case .success(let imageData):
-                                self.logger.info("✅ Successfully generated fallback image")
-                                completion(.success(imageData))
-                            case .failure(let error):
-                                self.logger.error("❌ Fallback image generation failed: \(error.localizedDescription)")
-                                completion(.failure(error))
-                            }
+                    // Generate fallback image with error information
+                    self.generateFallbackImage(from: "Error generating image: \(message)") { result in
+                        switch result {
+                        case .success(let imageData):
+                            self.logger.info("✅ Generated fallback image for error")
+                            completion(.success(imageData))
+                        case .failure(let error):
+                            self.logger.error("❌ Fallback image generation failed: \(error.localizedDescription)")
+                            completion(.failure(error))
                         }
-                        return
                     }
+                    return
                 }
                 
                 // If we reach here, we couldn't parse the response

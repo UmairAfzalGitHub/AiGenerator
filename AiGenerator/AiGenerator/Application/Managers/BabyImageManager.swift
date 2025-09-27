@@ -11,12 +11,16 @@ import os.log
 
 struct PromptOptions {
     static let styles = [
-        "highly realistic portrait",
-        "digital painting",
-        "soft studio lighting",
-        "cinematic photography",
-        "modern illustration",
-        "cute cartoon style"
+        "ultra-realistic portrait",
+        "professional studio photography",
+        "high-resolution DSLR photo",
+        "natural daylight portrait",
+        "soft natural lighting",
+        "cinematic portrait photography",
+        "fine art portrait photography",
+        "magazine cover photo",
+        "lifestyle photography",
+        "hyper-detailed close-up"
     ]
     
     static let backgrounds = [
@@ -180,29 +184,98 @@ final class BabyImageManager {
         logger.info("🌄 Selected background: \(background)")
         logger.info("😊 Selected mood: \(mood)")
         
-        // Start with a clear instruction to generate an image, not text
-        var prompt = "CREATE AN IMAGE: Generate a \(style) of a baby based on the parents provided. DO NOT DESCRIBE THE IMAGE, GENERATE THE ACTUAL IMAGE."
+        // Base prompt with style
+        var prompt = "A \(style) of"
         
-        if let gender = gender {
-            prompt += " The baby should be \(gender)."
-            logger.info("👪 Added gender to prompt: \(gender)")
-        }
-        if let ethnicity = ethnicity {
-            prompt += " Ethnicity: \(ethnicity)."
-            logger.info("🌍 Added ethnicity to prompt: \(ethnicity)")
-        }
-        if let babyName = babyName {
-            prompt += " The baby's name is \(babyName)."
-            logger.info("📛 Added name to prompt: \(babyName)")
-        }
+        // Age descriptor
         if let age = age {
             let descriptor = PromptOptions.ageDescriptors[String(age)] ?? "\(age)-year-old child"
-            prompt += " Age: \(descriptor)."
+            prompt += " a \(descriptor)"
             logger.info("👶 Added age to prompt: \(descriptor)")
+        } else {
+            prompt += " a baby"
         }
         
-        prompt += " The baby is \(mood), with a \(background)."
+        // Gender
+        if let gender = gender {
+            prompt += " \(gender)"
+            logger.info("👪 Added gender to prompt: \(gender)")
+        }
+        
+        // Ethnicity
+        if let ethnicity = ethnicity {
+            prompt += " of \(ethnicity) ethnicity"
+            logger.info("🌍 Added ethnicity to prompt: \(ethnicity)")
+        }
+        
+        // Baby name (identity cue)
+        if let babyName = babyName {
+            prompt += ", named \(babyName)"
+            logger.info("📛 Added name to prompt: \(babyName)")
+        }
+        
+        // Mood + background
+        prompt += ", looking \(mood), with full head and shoulders visible, centered in frame, natural proportions, in a \(background)."
+        
+        // Reinforce realism and quality
+        prompt += " Photorealistic facial features, ultra-detailed, high-resolution, natural skin tones, professional studio lighting, professional photography quality."
+        
         logger.info("💬 Final prompt length: \(prompt.count) characters")
         return prompt
     }
+
+    
+//    private func buildDynamicPrompt(
+//        gender: String?,
+//        ethnicity: String?,
+//        babyName: String?,
+//        age: Int?
+//    ) -> String {
+//        logger.info("📝 Building dynamic prompt")
+//        
+//        let style = PromptOptions.styles.randomElement() ?? ""
+//        let background = PromptOptions.backgrounds.randomElement() ?? ""
+//        let mood = PromptOptions.moods.randomElement() ?? ""
+//        
+//        logger.info("🎨 Selected style: \(style)")
+//        logger.info("🌄 Selected background: \(background)")
+//        logger.info("😊 Selected mood: \(mood)")
+//        
+//        // Start with a descriptive request instead of instructions
+//        var prompt = "A \(style) of "
+//        
+//        if let age = age {
+//            let descriptor = PromptOptions.ageDescriptors[String(age)] ?? "\(age)-year-old child"
+//            prompt += "a \(descriptor)"
+//            logger.info("👶 Added age to prompt: \(descriptor)")
+//        } else {
+//            prompt += "a baby"
+//        }
+//        
+//        if let gender = gender {
+//            prompt += " \(gender)"
+//            logger.info("👪 Added gender to prompt: \(gender)")
+//        }
+//        
+//        if let ethnicity = ethnicity {
+//            prompt += " of \(ethnicity) ethnicity"
+//            logger.info("🌍 Added ethnicity to prompt: \(ethnicity)")
+//        }
+//        
+//        // Baby name is optional – treat it as identity cue
+//        if let babyName = babyName {
+//            prompt += ", named \(babyName)"
+//            logger.info("📛 Added name to prompt: \(babyName)")
+//        }
+//        
+//        // Mood + background to finalize atmosphere
+//        prompt += ", looking \(mood), in a \(background)."
+//        
+//        // Reinforce realism and high quality
+//        prompt += " Ultra-detailed, high-resolution, natural skin tones, photorealistic facial features, professional photography quality."
+//        
+//        logger.info("💬 Final prompt length: \(prompt.count) characters")
+//        return prompt
+//    }
+
 }

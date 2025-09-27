@@ -530,11 +530,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     // MARK: - Helper Methods
     
     private func showResultsScreen(with image: UIImage, name: String) {
-        print(image)
         // Navigate to results screen with the generated baby image
-//        let resultsVC = ResultsViewController()
-//        resultsVC.configure(with: image, name: name)
-//        navigationController?.pushViewController(resultsVC, animated: true)
+        let resultsVC = ResultViewController(image: image, name: name)
+        resultsVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(resultsVC, animated: true)
     }
     
     private func showAlert(title: String, message: String) {
@@ -751,7 +750,7 @@ private class EthnicityButton: UIControl {
     }
 }
 
-private class GradientActionButton: UIButton {
+class GradientActionButton: UIButton {
     private let gradient = CAGradientLayer()
     
     override init(frame: CGRect) {
