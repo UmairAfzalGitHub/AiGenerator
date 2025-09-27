@@ -282,11 +282,45 @@ final class GoogleGeminiAPIClient {
             // Parse response JSON
             self.logger.info("🔍 Parsing response JSON")
             do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-                
                 // Log the full response for debugging
                 if let jsonString = String(data: data, encoding: .utf8) {
                     self.logger.info("💬 Response content: \(jsonString.prefix(500))...")
+                }
+                
+                // Check if response is empty or too small
+                if data.count < 10 {
+                    self.logger.error("❌ Response is empty or too small: \(data.count) bytes")
+                    // Handle empty response by generating a fallback image
+                    self.generateFallbackImage(from: "The API returned an empty response. This could be due to API quota limits, service issues, or invalid prompt content.") { result in
+                        switch result {
+                        case .success(let imageData):
+                            self.logger.info("✅ Generated fallback image for empty response")
+                            completion(.success(imageData))
+                        case .failure(let error):
+                            self.logger.error("❌ Fallback image generation failed: \(error.localizedDescription)")
+                            completion(.failure(error))
+                        }
+                    }
+                    return
+                }
+                
+                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                
+                // Handle empty JSON object case
+                if let jsonDict = json as? [String: Any], jsonDict.isEmpty {
+                    self.logger.error("❌ API returned empty JSON object {}")
+                    // Generate fallback image for empty JSON response
+                    self.generateFallbackImage(from: "The API returned an empty JSON object. This could be due to rate limiting, quota issues, or service problems.") { result in
+                        switch result {
+                        case .success(let imageData):
+                            self.logger.info("✅ Generated fallback image for empty JSON response")
+                            completion(.success(imageData))
+                        case .failure(let error):
+                            self.logger.error("❌ Fallback image generation failed: \(error.localizedDescription)")
+                            completion(.failure(error))
+                        }
+                    }
+                    return
                 }
                 
                 // Parse Imagen API response format
@@ -327,7 +361,18 @@ final class GoogleGeminiAPIClient {
                 }
                 let error = NSError(domain: "Invalid Response Format", code: -2)
                 self.logger.error("❌ Failed to parse response: \(error.localizedDescription)")
-                completion(.failure(error))
+                
+                // Generate fallback image for invalid format
+                self.generateFallbackImage(from: "The API response was in an unexpected format. Please try again later.") { result in
+                    switch result {
+                    case .success(let imageData):
+                        self.logger.info("✅ Generated fallback image for invalid format")
+                        completion(.success(imageData))
+                    case .failure(let error):
+                        self.logger.error("❌ Fallback image generation failed: \(error.localizedDescription)")
+                        completion(.failure(error))
+                    }
+                }
             }
             catch {
                 self.logger.error("❌ JSON parsing error: \(error.localizedDescription)")

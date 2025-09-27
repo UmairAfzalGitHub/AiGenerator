@@ -16,6 +16,7 @@ class ResultViewController: BaseViewController {
     // Result Image Section
     private let resultImageContainer = UIView()
     private let resultImageView = UIImageView()
+    private let fullScreenButton = UIButton(type: .system)
     
     // Action Buttons
     private let actionButtonsStack = UIStackView()
@@ -45,6 +46,7 @@ class ResultViewController: BaseViewController {
         setupCustomNavigationBar()
         setupScrollHierarchy()
         setupResultImageSection()
+        setupFullScreenButton()
         setupActionButtons()
         setupCreateNewButton()
     }
@@ -191,7 +193,30 @@ class ResultViewController: BaseViewController {
         ])
     }
     
+    // Setup full screen button
+    private func setupFullScreenButton() {
+        fullScreenButton.setImage(UIImage(systemName: "arrow.up.left.and.arrow.down.right"), for: .normal)
+        fullScreenButton.backgroundColor = UIColor(white: 0.2, alpha: 0.7)
+        fullScreenButton.tintColor = .white
+        fullScreenButton.layer.cornerRadius = 15
+        fullScreenButton.addTarget(self, action: #selector(fullScreenTapped), for: .touchUpInside)
+        fullScreenButton.translatesAutoresizingMaskIntoConstraints = false
+        resultImageContainer.addSubview(fullScreenButton)
+        
+        NSLayoutConstraint.activate([
+            fullScreenButton.topAnchor.constraint(equalTo: resultImageView.topAnchor, constant: 12),
+            fullScreenButton.trailingAnchor.constraint(equalTo: resultImageView.trailingAnchor, constant: -12),
+            fullScreenButton.widthAnchor.constraint(equalToConstant: 30),
+            fullScreenButton.heightAnchor.constraint(equalToConstant: 30)
+        ])
+    }
+    
     // MARK: - Actions
+    @objc private func fullScreenTapped() {
+        let fullScreenVC = FullScreenImageViewController(image: babyImage)
+        present(fullScreenVC, animated: true)
+    }
+    
     @objc private func shareTapped() {
         let activityVC = UIActivityViewController(activityItems: [babyImage, "Check out my AI-generated baby: \(babyName)"], applicationActivities: nil)
         present(activityVC, animated: true)
