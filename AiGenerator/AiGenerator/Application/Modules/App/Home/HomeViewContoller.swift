@@ -39,6 +39,8 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     // Section: Select Age
     private let ageTitle = UILabel()
     private let ageRow = UIStackView()
+    private var agePills: [AgePill] = []
+    private var selectedAgeIndex: Int? { didSet { updateAgeSelection() } }
     
     // Section: Select Ethnicity
     private let ethnicityTitle = UILabel()
@@ -100,6 +102,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         for button in ethnicityButtons {
             button.updateGradientBorder()
         }
+        // Update age pills gradient borders
+        for pill in agePills {
+            pill.updateGradientBorder()
+        }
     }
     
     // MARK: - Setup
@@ -121,6 +127,24 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
         ])
+    }
+
+    // Manage Age selection visual state
+    private func updateAgeSelection() {
+        for (idx, pill) in agePills.enumerated() {
+            pill.isPicked = (idx == selectedAgeIndex)
+        }
+    }
+
+    @objc private func ageTapped(_ sender: AgePill) {
+        selectedAgeIndex = sender.tag
+        print("Age selected: \(sender.text)")
+    }
+
+    @objc private func ageViewTapped(_ sender: UITapGestureRecognizer) {
+        guard let pill = sender.view as? AgePill else { return }
+        selectedAgeIndex = pill.tag
+        print("Age selected: \(pill.text)")
     }
     
     private func setupParentsSection() {
@@ -325,9 +349,17 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         ageRow.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(ageRow)
 
-        // Build 5 cells labeled 1..5, styled like ethnicity cells
-        ["1", "2", "3", "4", "5"].forEach { text in
-            let pill = AgePill(title: text)
+        // Build 5 cells labeled 1..5, styled like ethnicity cells and selectable
+        ["1", "2", "3", "4", "5"].enumerated().forEach { (idx, text) in
+            let pill = AgePill()
+            pill.configure(text: text)
+            pill.tag = idx
+            // UIControl target
+            pill.addTarget(self, action: #selector(ageTapped(_:)), for: .touchUpInside)
+            // Also add tap gesture as requested
+            let tap = UITapGestureRecognizer(target: self, action: #selector(ageViewTapped(_:)))
+            pill.addGestureRecognizer(tap)
+            agePills.append(pill)
             ageRow.addArrangedSubview(pill)
             pill.heightAnchor.constraint(equalToConstant: 56).isActive = true
         }
@@ -788,38 +820,82 @@ private class EthnicityButton: UIControl {
     }
 }
 
-// Simple Age Pill to match Ethnicity style
-private class AgePill: UIView {
+// Selectable Age Pill to match Ethnicity style
+private class AgePill: UIControl {
+    private let container = UIView()
     private let titleLabel = UILabel()
+    var isPicked: Bool = false { didSet { refresh() } }
+    var text: String { titleLabel.text ?? "" }
 
-    init(title: String) {
-        super.init(frame: .zero)
-        setup(title: title)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setup()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        setup(title: "")
+        setup()
     }
 
-    private func setup(title: String) {
-        translatesAutoresizingMaskIntoConstraints = false
-        backgroundColor = UIColor(white: 0.12, alpha: 1)
-        layer.cornerRadius = 16
-        clipsToBounds = true
+    func configure(text: String, isSelected: Bool = false) {
+        titleLabel.text = text
+        isPicked = isSelected
+    }
 
-        titleLabel.text = title
+    private func setup() {
+        translatesAutoresizingMaskIntoConstraints = false
+        container.translatesAutoresizingMaskIntoConstraints = false
+        container.backgroundColor = UIColor(white: 0.12, alpha: 1)
+        container.layer.cornerRadius = 16
+        container.isUserInteractionEnabled = false
+        addSubview(container)
+
         titleLabel.textColor = .white
         titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
         titleLabel.textAlignment = .center
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(titleLabel)
+        container.addSubview(titleLabel)
 
         NSLayoutConstraint.activate([
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
-            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+            container.topAnchor.constraint(equalTo: topAnchor),
+            container.leadingAnchor.constraint(equalTo: leadingAnchor),
+            container.trailingAnchor.constraint(equalTo: trailingAnchor),
+            container.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            titleLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+            titleLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8),
+            titleLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor)
         ])
+
+        refresh()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if isPicked {
+            container.updateGradientBorder()
+        }
+    }
+
+
+    private func refresh() {
+        if isPicked {
+            // Apply gradient border
+            let gradientColors = [
+                UIColor.appPrimaryBlue.cgColor,
+                UIColor.appPrimary.cgColor
+            ]
+            container.addGradientBorder(
+                colors: gradientColors,
+                width: 2,
+                cornerRadius: 16
+            )
+            container.backgroundColor = UIColor(red: 255/255, green: 153/255, blue: 221/255, alpha: 0.1)
+        } else {
+            container.removeGradientBorder()
+            container.backgroundColor = UIColor(white: 0.12, alpha: 1)
+        }
+        container.layer.cornerRadius = 16
     }
 }
 
