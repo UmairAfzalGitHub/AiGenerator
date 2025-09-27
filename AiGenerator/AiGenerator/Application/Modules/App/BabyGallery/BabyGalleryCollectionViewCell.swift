@@ -19,6 +19,7 @@ class BabyGalleryCollectionViewCell: UICollectionViewCell {
     private var menuActions: [UIMenuElement] = []
     weak var delegate: BabyGalleryCollectionViewCellDelegate?
     private(set) var currentColor: UIColor?
+    private(set) var currentImage: UIImage?
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -149,8 +150,17 @@ class BabyGalleryCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Configuration
     func configure(with color: UIColor) {
+        imageView.image = nil
         imageView.backgroundColor = color
         currentColor = color
+        currentImage = nil
+    }
+    
+    func configure(with image: UIImage) {
+        imageView.backgroundColor = nil
+        imageView.image = image
+        currentImage = image
+        currentColor = nil
     }
     
     // MARK: - Action Handlers

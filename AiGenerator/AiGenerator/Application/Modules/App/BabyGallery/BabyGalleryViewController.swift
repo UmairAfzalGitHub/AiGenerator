@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import os.log
 
 class BabyGalleryViewController: BaseViewController {
 
@@ -14,8 +15,8 @@ class BabyGalleryViewController: BaseViewController {
     private let noDataContentView = UIView()
     
     // MARK: - Properties
-    private var dataSource: UICollectionViewDiffableDataSource<Section, BabyItem>?
-    private var mockItems: [BabyItem] = []
+    private var dataSource: UICollectionViewDiffableDataSource<Section, BabyHistoryItem>?
+    private var historyItems: [BabyHistoryItem] = []
     
     // MARK: - Enums
     enum Section: Int, CaseIterable {
@@ -24,14 +25,21 @@ class BabyGalleryViewController: BaseViewController {
 
     
     // MARK: - Lifecycle
+    private let logger = Logger(subsystem: "com.aiGenerator.app", category: "BabyGalleryViewController")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Baby Gallery"
         view.backgroundColor = .black
         setupNavigationBar()
         setupCollectionView()
+        setupNoDataView()
         configureDataSource()
-        loadMockData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        loadHistoryData()
     }
     
     // MARK: - Setup Methods
@@ -41,6 +49,7 @@ class BabyGalleryViewController: BaseViewController {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
         collectionView.register(BabyGalleryCollectionViewCell.self, forCellWithReuseIdentifier: BabyGalleryCollectionViewCell.identifier)
+        collectionView.delegate = self
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
@@ -143,17 +152,25 @@ class BabyGalleryViewController: BaseViewController {
     
     // MARK: - Data Source
     private func configureDataSource() {
-        dataSource = UICollectionViewDiffableDataSource<Section, BabyItem>(
+        dataSource = UICollectionViewDiffableDataSource<Section, BabyHistoryItem>(
             collectionView: collectionView,
             cellProvider: { [weak self] (collectionView, indexPath, item) -> UICollectionViewCell? in
-                guard let cell = collectionView.dequeueReusableCell(
-                    withReuseIdentifier: BabyGalleryCollectionViewCell.identifier,
-                    for: indexPath
-                ) as? BabyGalleryCollectionViewCell else {
+                guard let self = self,
+                      let cell = collectionView.dequeueReusableCell(
+                        withReuseIdentifier: BabyGalleryCollectionViewCell.identifier,
+                        for: indexPath
+                      ) as? BabyGalleryCollectionViewCell else {
                     return nil
                 }
                 
-                cell.configure(with: item.color)
+                // Load image for this history item
+                if let image = HistoryManager.shared.loadImage(for: item) {
+                    cell.configure(with: image)
+                } else {
+                    // Fallback to a placeholder color if image can't be loaded
+                    cell.configure(with: self.generateRandomColor())
+                }
+                
                 cell.delegate = self
                 return cell
             }
@@ -161,21 +178,27 @@ class BabyGalleryViewController: BaseViewController {
     }
     
     // MARK: - Data Loading
-    private func loadMockData() {
-        // Generate 20 mock items with random colors
-        mockItems = (0..<20).map { _ in
-            BabyItem(id: UUID().uuidString, color: generateRandomColor())
-        }
+    private func loadHistoryData() {
+        logger.info("📋 Loading baby history data")
+        
+        // Get all history items from HistoryManager
+        historyItems = HistoryManager.shared.getAllHistoryItems()
         
         // Apply snapshot
-        var snapshot = NSDiffableDataSourceSnapshot<Section, BabyItem>()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, BabyHistoryItem>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(mockItems, toSection: .main)
+        snapshot.appendItems(historyItems, toSection: .main)
         dataSource?.apply(snapshot, animatingDifferences: true)
         
         // Show/hide no data view
-        noDataContentView.isHidden = !mockItems.isEmpty
-        collectionView.isHidden = mockItems.isEmpty
+        noDataContentView.isHidden = !historyItems.isEmpty
+        collectionView.isHidden = historyItems.isEmpty
+        
+        if historyItems.isEmpty {
+            logger.info("ℹ️ No history items found")
+        } else {
+            logger.info("✅ Loaded \(self.historyItems.count) history items")
+        }
     }
     
     // MARK: - Helper Methods
@@ -209,35 +232,63 @@ struct BabyItem: Hashable {
     }
 }
 
+// MARK: - UICollectionViewDelegate
+extension BabyGalleryViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let item = dataSource?.itemIdentifier(for: indexPath) else { return }
+        
+        // Load the image for this history item
+        if let image = HistoryManager.shared.loadImage(for: item) {
+            // Open ResultViewController with the image and baby name
+            let resultVC = ResultViewController(image: image, name: item.babyName)
+            navigationController?.pushViewController(resultVC, animated: true)
+        }
+    }
+}
+
 // MARK: - BabyGalleryCollectionViewCellDelegate
 extension BabyGalleryViewController: BabyGalleryCollectionViewCellDelegate {
     func didTapViewAction(in cell: BabyGalleryCollectionViewCell) {
-        guard let color = cell.currentColor else { return }
+        // Get image to display
+        let imageToDisplay: UIImage
         
-        // Create a placeholder image with the cell's color
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1000, height: 1000))
-        let image = renderer.image { context in
-            color.setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 1000, height: 1000))
+        if let image = cell.currentImage {
+            imageToDisplay = image
+        } else if let color = cell.currentColor {
+            // Create a placeholder image with the cell's color
+            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1000, height: 1000))
+            imageToDisplay = renderer.image { context in
+                color.setFill()
+                context.fill(CGRect(x: 0, y: 0, width: 1000, height: 1000))
+            }
+        } else {
+            return
         }
         
         // Present the full screen view controller
-        let fullScreenVC = FullScreenImageViewController(image: image)
+        let fullScreenVC = FullScreenImageViewController(image: imageToDisplay)
         present(fullScreenVC, animated: true)
     }
     
     func didTapShareAction(in cell: BabyGalleryCollectionViewCell) {
-        guard let color = cell.currentColor else { return }
+        // Get image to share
+        let imageToShare: UIImage
         
-        // Create a placeholder image with the cell's color
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1000, height: 1000))
-        let image = renderer.image { context in
-            color.setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 1000, height: 1000))
+        if let image = cell.currentImage {
+            imageToShare = image
+        } else if let color = cell.currentColor {
+            // Create a placeholder image with the cell's color
+            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 1000, height: 1000))
+            imageToShare = renderer.image { context in
+                color.setFill()
+                context.fill(CGRect(x: 0, y: 0, width: 1000, height: 1000))
+            }
+        } else {
+            return
         }
         
         // Present share sheet
-        let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        let activityVC = UIActivityViewController(activityItems: [imageToShare], applicationActivities: nil)
         
         // For iPad, set the source view to prevent crash
         if let popoverController = activityVC.popoverPresentationController {
@@ -255,21 +306,66 @@ extension BabyGalleryViewController: BabyGalleryCollectionViewCellDelegate {
             return
         }
         
-        // Remove the item from the data source
-        var snapshot = dataSource?.snapshot()
-        snapshot?.deleteItems([item])
+        // Show confirmation alert
+        let alert = UIAlertController(
+            title: "Delete Baby Image",
+            message: "Are you sure you want to delete this baby image? This action cannot be undone.",
+            preferredStyle: .alert
+        )
         
-        if let snapshot = snapshot {
-            dataSource?.apply(snapshot, animatingDifferences: true)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
+            self?.deleteHistoryItem(item)
+        })
+        
+        present(alert, animated: true)
+    }
+    
+    private func deleteHistoryItem(_ item: BabyHistoryItem) {
+        logger.info("🗑️ Deleting history item with ID: \(item.id)")
+        
+        // Delete from HistoryManager
+        HistoryManager.shared.deleteHistoryItem(item) { [weak self] result in
+            guard let self = self else { return }
             
-            // Update mock items array
-            if let index = mockItems.firstIndex(where: { $0.id == item.id }) {
-                mockItems.remove(at: index)
+            switch result {
+            case .success:
+                self.logger.info("✅ Successfully deleted history item")
+                
+                // Remove item from UI
+                DispatchQueue.main.async {
+                    // Update data source
+                    var snapshot = self.dataSource?.snapshot()
+                    snapshot?.deleteItems([item])
+                    
+                    if let snapshot = snapshot {
+                        self.dataSource?.apply(snapshot, animatingDifferences: true)
+                        
+                        // Update history items array
+                        if let index = self.historyItems.firstIndex(where: { $0.id == item.id }) {
+                            self.historyItems.remove(at: index)
+                        }
+                        
+                        // Show/hide no data view if needed
+                        self.noDataContentView.isHidden = !self.historyItems.isEmpty
+                        self.collectionView.isHidden = self.historyItems.isEmpty
+                    }
+                }
+                
+            case .failure(let error):
+                self.logger.error("❌ Failed to delete history item: \(error.localizedDescription)")
+                
+                // Show error alert
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(
+                        title: "Delete Failed",
+                        message: "Failed to delete the baby image. Please try again.",
+                        preferredStyle: .alert
+                    )
+                    alert.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(alert, animated: true)
+                }
             }
-            
-            // Show/hide no data view if needed
-            noDataContentView.isHidden = !mockItems.isEmpty
-            collectionView.isHidden = mockItems.isEmpty
         }
     }
 }

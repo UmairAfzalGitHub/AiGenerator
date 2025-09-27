@@ -117,6 +117,10 @@ final class BabyImageManager {
                 
                 if let image = UIImage(data: data) {
                     self.logger.info("✅ Successfully created baby image: \(image.size.width)x\(image.size.height)")
+                    
+                    // Save to history
+                    self.saveToHistory(image: image, gender: gender ?? "random", ethnicity: ethnicity ?? "unknown", babyName: babyName ?? "Baby", age: age ?? 0, prompt: prompt)
+                    
                     completion(.success(image))
                 } else {
                     let error = NSError(domain: "ImageDecodeError", code: -3, userInfo: [NSLocalizedDescriptionKey: "Failed to decode image data"])
@@ -222,6 +226,27 @@ final class BabyImageManager {
         
         logger.info("💬 Final prompt length: \(prompt.count) characters")
         return prompt
+    }
+    
+    // MARK: - History Management
+    private func saveToHistory(image: UIImage, gender: String, ethnicity: String, babyName: String, age: Int, prompt: String) {
+        logger.info("📝 Saving generated image to history for baby: \(babyName)")
+        
+        HistoryManager.shared.saveGeneratedImage(
+            image: image,
+            babyName: babyName,
+            gender: gender,
+            ethnicity: ethnicity,
+            age: age,
+            prompt: prompt
+        ) { result in
+            switch result {
+            case .success(let historyItem):
+                self.logger.info("✅ Successfully saved to history with ID: \(historyItem.id)")
+            case .failure(let error):
+                self.logger.error("❌ Failed to save to history: \(error.localizedDescription)")
+            }
+        }
     }
 
     
