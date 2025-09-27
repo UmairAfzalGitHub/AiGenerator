@@ -24,6 +24,8 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     private let motherTitle = UILabel()
     private let fatherPlus = UIButton(type: .system)
     private let motherPlus = UIButton(type: .system)
+    private let fatherIcon = UIImageView(image: UIImage(systemName: "person.circle"))
+    private let motherIcon = UIImageView(image: UIImage(systemName: "person.circle"))
     
     // Section: Baby Name
     private let babyNameTitle = UILabel()
@@ -208,18 +210,24 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(titleLabel)
         
-        let personIcon = UIImageView(image: UIImage(systemName: "person.circle"))
-        personIcon.tintColor = UIColor(white: 0.6, alpha: 1)
-        personIcon.translatesAutoresizingMaskIntoConstraints = false
-        card.addSubview(personIcon)
+        // Configure appropriate icon instance so we can hide it later
+        let iconView: UIImageView = (title.contains("Father")) ? fatherIcon : motherIcon
+        iconView.tintColor = UIColor(white: 0.6, alpha: 1)
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+        card.addSubview(iconView)
         
         plusButton.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
         plusButton.tintColor = .white
         plusButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
         plusButton.layer.cornerRadius = 20
-        plusButton.addTarget(self, action: action, for: .touchUpInside)
+        // Make the whole card tappable instead of the plus button
+        plusButton.isUserInteractionEnabled = false
         plusButton.translatesAutoresizingMaskIntoConstraints = false
         card.addSubview(plusButton)
+
+        // Add tap gesture to the entire card
+        let tap = UITapGestureRecognizer(target: self, action: action)
+        card.addGestureRecognizer(tap)
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: card.topAnchor, constant: 8),
@@ -227,13 +235,13 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
             imageView.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -8),
             imageView.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -8),
             
-            personIcon.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
-            personIcon.topAnchor.constraint(equalTo: card.topAnchor, constant: 18),
-            personIcon.widthAnchor.constraint(equalToConstant: 28),
-            personIcon.heightAnchor.constraint(equalToConstant: 28),
+            iconView.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 16),
+            iconView.topAnchor.constraint(equalTo: card.topAnchor, constant: 18),
+            iconView.widthAnchor.constraint(equalToConstant: 28),
+            iconView.heightAnchor.constraint(equalToConstant: 28),
             
-            titleLabel.leadingAnchor.constraint(equalTo: personIcon.trailingAnchor, constant: 8),
-            titleLabel.centerYAnchor.constraint(equalTo: personIcon.centerYAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 8),
+            titleLabel.centerYAnchor.constraint(equalTo: iconView.centerYAnchor),
             titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: card.trailingAnchor, constant: -16),
             
             plusButton.widthAnchor.constraint(equalToConstant: 40),
@@ -576,6 +584,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
                     width: 2.0,
                     cornerRadius: 16
                 )
+                // Hide placeholders when image is set
+                self.fatherTitle.isHidden = true
+                self.fatherIcon.isHidden = true
+                self.fatherPlus.isHidden = true
             }
         case .mother:
             motherImageView.image = img
@@ -587,6 +599,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
                     width: 2.0,
                     cornerRadius: 16
                 )
+                // Hide placeholders when image is set
+                self.motherTitle.isHidden = true
+                self.motherIcon.isHidden = true
+                self.motherPlus.isHidden = true
             }
         case .none:
             break
