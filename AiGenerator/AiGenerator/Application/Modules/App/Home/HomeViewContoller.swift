@@ -36,6 +36,10 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
     private let girlButton = GenderButton()
     private let boyButton = GenderButton()
     
+    // Section: Select Age
+    private let ageTitle = UILabel()
+    private let ageRow = UIStackView()
+    
     // Section: Select Ethnicity
     private let ethnicityTitle = UILabel()
     private let ethnicityGrid = UIStackView()
@@ -67,6 +71,7 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         setupParentsSection()
         setupBabyNameSection()
         setupGenderSection()
+        setupAgeSection()
         setupEthnicitySection()
         setupGenerateButton()
     }
@@ -304,6 +309,39 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         girlButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
         boyButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
     }
+
+    private func setupAgeSection() {
+        // Title
+        ageTitle.text = "Select Age"
+        ageTitle.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
+        ageTitle.textColor = .white
+        ageTitle.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(ageTitle)
+
+        // Horizontal row
+        ageRow.axis = .horizontal
+        ageRow.spacing = 12
+        ageRow.distribution = .fillEqually
+        ageRow.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(ageRow)
+
+        // Build 5 cells labeled 1..5, styled like ethnicity cells
+        ["1", "2", "3", "4", "5"].forEach { text in
+            let pill = AgePill(title: text)
+            ageRow.addArrangedSubview(pill)
+            pill.heightAnchor.constraint(equalToConstant: 56).isActive = true
+        }
+
+        NSLayoutConstraint.activate([
+            ageTitle.topAnchor.constraint(equalTo: genderStack.bottomAnchor, constant: 36),
+            ageTitle.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            ageTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+
+            ageRow.topAnchor.constraint(equalTo: ageTitle.bottomAnchor, constant: 12),
+            ageRow.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            ageRow.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
+        ])
+    }
     
     private func setupEthnicitySection() {
         ethnicityTitle.text = "Select Ethnicity"
@@ -338,7 +376,7 @@ class HomeViewContoller: BaseViewController, UIImagePickerControllerDelegate, UI
         }
         
         NSLayoutConstraint.activate([
-            ethnicityTitle.topAnchor.constraint(equalTo: genderStack.bottomAnchor, constant: 36),
+            ethnicityTitle.topAnchor.constraint(equalTo: ageRow.bottomAnchor, constant: 36),
             ethnicityTitle.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             ethnicityTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
@@ -747,6 +785,41 @@ private class EthnicityButton: UIControl {
             container.layer.cornerRadius = 16
             checkmark.isHidden = true
         }
+    }
+}
+
+// Simple Age Pill to match Ethnicity style
+private class AgePill: UIView {
+    private let titleLabel = UILabel()
+
+    init(title: String) {
+        super.init(frame: .zero)
+        setup(title: title)
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setup(title: "")
+    }
+
+    private func setup(title: String) {
+        translatesAutoresizingMaskIntoConstraints = false
+        backgroundColor = UIColor(white: 0.12, alpha: 1)
+        layer.cornerRadius = 16
+        clipsToBounds = true
+
+        titleLabel.text = title
+        titleLabel.textColor = .white
+        titleLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        titleLabel.textAlignment = .center
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(titleLabel)
+
+        NSLayoutConstraint.activate([
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -8),
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
     }
 }
 
