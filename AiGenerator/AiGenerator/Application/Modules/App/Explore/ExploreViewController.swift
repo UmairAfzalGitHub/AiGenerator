@@ -163,6 +163,9 @@ class ExploreViewController: BaseViewController {
         return view
     }()
     
+    // Track selected card for visual selection state
+    private weak var selectedCard: UIView?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -416,7 +419,29 @@ class ExploreViewController: BaseViewController {
             label.topAnchor.constraint(equalTo: labelView.topAnchor, constant: 4),
             label.bottomAnchor.constraint(equalTo: labelView.bottomAnchor, constant: -4)
         ])
+        
+        // Make the card selectable and navigable
+        card.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(cardTapped(_:)))
+        card.addGestureRecognizer(tap)
 
         return card
+    }
+
+    @objc private func cardTapped(_ sender: UITapGestureRecognizer) {
+        guard let view = sender.view else { return }
+        // Update selection visuals
+        selectedCard?.removeGradientBorder()
+        selectedCard = view
+        let gradientColors = [
+            UIColor.appPrimaryBlue.cgColor,
+            UIColor.appPrimary.cgColor
+        ]
+        view.addGradientBorder(colors: gradientColors, width: 2, cornerRadius: 12)
+        
+        // Navigate to HomeViewContoller
+        let vc = HomeViewContoller()
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
